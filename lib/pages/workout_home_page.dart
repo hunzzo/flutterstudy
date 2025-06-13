@@ -10,6 +10,8 @@ import 'settings_page.dart';
 import '../providers/workout_data.dart';
 import 'package:provider/provider.dart';
 
+import 'package:provider/provider.dart';
+
 class WorkoutHomePage extends StatefulWidget {
   @override
   _WorkoutHomePageState createState() => _WorkoutHomePageState();
@@ -31,6 +33,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('운동 기록'),
+
         backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         actions: [
@@ -48,11 +51,13 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                 child: Text('설정'),
               ),
             ],
+
           ),
         ],
       ),
       body: CustomScrollView(
         slivers: [
+
           const SliverToBoxAdapter(
             child: MuscleRecoverySection(),
           ),
@@ -81,6 +86,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
             child: ScrollHintSection(),
           ),
           SliverToBoxAdapter(
+
             child: WorkoutLogSection(
               selectedDay: _selectedDay,
               onAddWorkout: _showAddWorkoutDialog,
@@ -188,8 +194,10 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                       Navigator.of(context).pop();
                     }
                   },
+
                   style:
                       ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),
+
                   child: const Text('추가'),
                 ),
               ],

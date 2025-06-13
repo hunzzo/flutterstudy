@@ -46,36 +46,45 @@ class MuscleRecoverySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final recoveryStatus = _getMuscleRecoveryStatus(context);
+
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: isDark ? Colors.grey[900] : Colors.grey[100],
+
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
+
             children: [
               Icon(Icons.healing, color: isDark ? Colors.white : Colors.black),
               const SizedBox(width: 8),
+
               Text(
                 '근육 회복 상태',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
+
                   color: isDark ? Colors.white : Colors.black,
+
                 ),
               ),
             ],
           ),
           const SizedBox(height: 16),
+
           _buildMuscleRecoveryView(recoveryStatus, isDark),
+
         ],
       ),
     );
   }
 
   Widget _buildMuscleRecoveryView(
+
       Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus, bool isDark) {
+
     return SizedBox(
       height: 400,
       child: Row(
@@ -94,12 +103,16 @@ class MuscleRecoverySection extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+
                   Text(
+
                     '회복 상태',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
+
                       color: isDark ? Colors.white : Colors.black,
+
                     ),
                   ),
                   const SizedBox(height: 16),
@@ -107,7 +120,9 @@ class MuscleRecoverySection extends StatelessWidget {
                     child: ListView(
                       children: MuscleGroup.values
                           .map((muscle) => _buildMuscleInfoCard(
+
                               recoveryStatus[muscle]!, isDark))
+
                           .toList(),
                     ),
                   ),
@@ -120,14 +135,18 @@ class MuscleRecoverySection extends StatelessWidget {
     );
   }
 
+
   Widget _buildMuscleInfoCard(MuscleRecoveryInfo info, bool isDark) {
+
     Color statusColor = _getRecoveryColor(info.damageLevel);
     String statusText = _getRecoveryText(info.damageLevel);
     int recoveryHours = _getRecoveryHours(info.damageLevel);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
+
       color: isDark ? Colors.grey[800] : Colors.white,
+
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -138,8 +157,10 @@ class MuscleRecoverySection extends StatelessWidget {
               children: [
                 Text(
                   _getMuscleGroupName(info.muscleGroup),
+
                   style: TextStyle(
                     color: isDark ? Colors.white : Colors.black,
+
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -160,16 +181,20 @@ class MuscleRecoverySection extends StatelessWidget {
             const SizedBox(height: 8),
             LinearProgressIndicator(
               value: info.damageLevel / 10,
+
               backgroundColor: isDark ? Colors.grey[600] : Colors.grey[300],
+
               valueColor: AlwaysStoppedAnimation<Color>(statusColor),
             ),
             const SizedBox(height: 4),
             Text(
               recoveryHours > 0 ? '회복까지 ${recoveryHours}시간' : '회복 완료',
+
               style: TextStyle(
                 color: isDark ? Colors.grey[400] : Colors.grey[700],
                 fontSize: 12,
               ),
+
             ),
           ],
         ),
