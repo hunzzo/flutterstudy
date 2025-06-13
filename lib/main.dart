@@ -21,7 +21,7 @@ class WorkoutApp extends StatelessWidget {
           primarySwatch: Colors.blue,
           visualDensity: VisualDensity.adaptivePlatformDensity,
         ),
-        home: const WorkoutHomePage(),
+        home: WorkoutHomePage(),
       ),
     );
   }
