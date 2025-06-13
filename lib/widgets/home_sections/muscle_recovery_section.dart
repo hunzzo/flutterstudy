@@ -64,13 +64,12 @@ class MuscleRecoverySection extends StatelessWidget {
                 '근육 회복 상태',
 
                 style: Theme.of(context).textTheme.titleLarge,
-
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          _buildMuscleRecoveryView(recoveryStatus, isDark),
+          _buildMuscleRecoveryView(context, recoveryStatus, isDark),
 
         ],
       ),
@@ -78,8 +77,9 @@ class MuscleRecoverySection extends StatelessWidget {
   }
 
   Widget _buildMuscleRecoveryView(
-
-      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus, bool isDark) {
+      BuildContext context,
+      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus,
+      bool isDark) {
 
     return SizedBox(
       height: 400,
@@ -114,8 +114,7 @@ class MuscleRecoverySection extends StatelessWidget {
                     child: ListView(
                       children: MuscleGroup.values
                           .map((muscle) => _buildMuscleInfoCard(
-
-                              recoveryStatus[muscle]!, isDark))
+                              context, recoveryStatus[muscle]!, isDark))
 
                           .toList(),
                     ),
@@ -130,7 +129,8 @@ class MuscleRecoverySection extends StatelessWidget {
   }
 
 
-  Widget _buildMuscleInfoCard(MuscleRecoveryInfo info, bool isDark) {
+  Widget _buildMuscleInfoCard(
+      BuildContext context, MuscleRecoveryInfo info, bool isDark) {
 
     Color statusColor = _getRecoveryColor(info.damageLevel);
     String statusText = _getRecoveryText(info.damageLevel);
