@@ -91,7 +91,7 @@ class WorkoutLogSection extends StatelessWidget {
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor:
-                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                  Theme.of(context).colorScheme.primary.withAlpha(51),
               child: Icon(Icons.fitness_center,
                   color: Theme.of(context).colorScheme.primary),
             ),
