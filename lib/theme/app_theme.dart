@@ -4,7 +4,6 @@ class AppColors {
   static const Color primary = Color(0xFF2196F3); // blue
   static const Color secondary = Color(0xFFFF9800); // orange
   static const Color hint = Colors.grey;
-
   static const Color lightTextMain = Colors.black87;
   static const Color lightTextFaded = Colors.black54;
   static const Color darkTextMain = Colors.white;
