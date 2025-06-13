@@ -8,7 +8,11 @@ import '../widgets/home_sections/scroll_hint_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
+
 import 'package:provider/provider.dart';
+
+import 'settings_page.dart';
+
 
 class WorkoutHomePage extends StatefulWidget {
   @override
@@ -35,7 +39,11 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
         elevation: 0,
         actions: [
           IconButton(
+
             icon: const Icon(Icons.settings),
+
+            icon: Icon(Icons.settings),
+ main
             onPressed: () {
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (_) => const SettingsPage()),
