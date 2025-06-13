@@ -11,7 +11,7 @@ import '../providers/workout_data.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutHomePage extends StatefulWidget {
-  const WorkoutHomePage({Key? key}) : super(key: key);
+  const WorkoutHomePage({super.key});
 
   @override
   WorkoutHomePageState createState() => WorkoutHomePageState();
@@ -97,7 +97,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddWorkoutDialog,
-        backgroundColor: Colors.blue[600],
+        backgroundColor: Theme.of(context).colorScheme.primary,
         child: const Icon(Icons.add),
       ),
     );
@@ -196,7 +196,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                   },
 
                   style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),
+                      ElevatedButton.styleFrom(backgroundColor: Theme.of(context).colorScheme.primary),
 
                   child: const Text('추가'),
                 ),

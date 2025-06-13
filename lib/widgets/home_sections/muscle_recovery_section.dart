@@ -63,19 +63,16 @@ class MuscleRecoverySection extends StatelessWidget {
 
               Text(
                 '근육 회복 상태',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-
-                  color: isDark ? Colors.white : Colors.black,
-
-                ),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(color: isDark ? Colors.white : Colors.black),
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          _buildMuscleRecoveryView(recoveryStatus, isDark),
+          _buildMuscleRecoveryView(context, recoveryStatus, isDark),
 
         ],
       ),
@@ -83,8 +80,9 @@ class MuscleRecoverySection extends StatelessWidget {
   }
 
   Widget _buildMuscleRecoveryView(
-
-      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus, bool isDark) {
+      BuildContext context,
+      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus,
+      bool isDark) {
 
     return SizedBox(
       height: 400,
@@ -108,13 +106,13 @@ class MuscleRecoverySection extends StatelessWidget {
                   Text(
 
                     '회복 상태',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-
-                      color: isDark ? Colors.white : Colors.black,
-
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(
+                          fontWeight: FontWeight.bold,
+                          color: isDark ? Colors.white : Colors.black,
+                        ),
                   ),
                   const SizedBox(height: 16),
                   Expanded(

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'pages/workout_home_page.dart';
 import 'providers/workout_data.dart';
 import 'providers/theme_provider.dart';
+import 'theme/app_theme.dart';
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -24,11 +25,8 @@ class WorkoutApp extends StatelessWidget {
         builder: (context, themeProvider, _) {
           return MaterialApp(
             title: '운동 기록',
-            theme: ThemeData(
-              primarySwatch: Colors.blue,
-              visualDensity: VisualDensity.adaptivePlatformDensity,
-            ),
-            darkTheme: ThemeData.dark(),
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
             themeMode: themeProvider.themeMode,
             home: WorkoutHomePage(),
           );
