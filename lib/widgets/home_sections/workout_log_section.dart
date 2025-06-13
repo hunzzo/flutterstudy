@@ -26,16 +26,14 @@ class WorkoutLogSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.fitness_center, color: Colors.blue[600]),
+              Icon(Icons.fitness_center,
+                  color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 selectedDay != null
                     ? '${selectedDay!.month}월 ${selectedDay!.day}일 운동 기록'
                     : '오늘의 운동 기록',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ],
           ),
@@ -61,13 +59,17 @@ class WorkoutLogSection extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 '이 날의 운동 기록이 없습니다',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(fontSize: 16),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: onAddWorkout,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary,
                 ),
                 child: const Text('운동 기록 추가'),
               ),
@@ -88,12 +90,17 @@ class WorkoutLogSection extends StatelessWidget {
           elevation: 2,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.blue[100],
-              child: Icon(Icons.fitness_center, color: Colors.blue[600]),
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              child: Icon(Icons.fitness_center,
+                  color: Theme.of(context).colorScheme.primary),
             ),
             title: Text(
               workout.exercise,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             subtitle: Text('${workout.sets} | ${workout.details}'),
             trailing: Row(

@@ -47,35 +47,28 @@ class MuscleRecoverySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-      final isDark = Theme.of(context).brightness == Brightness.dark;
-      final recoveryStatus = _getMuscleRecoveryStatus(context);
-      return Container(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final recoveryStatus = _getMuscleRecoveryStatus(context);
+    return Container(
       color: isDark ? Colors.grey[900] : Colors.grey[100],
 
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
           Row(
-
             children: [
-              Icon(Icons.healing, color: isDark ? Colors.white : Colors.black),
+              Icon(Icons.healing,
+                  color: Theme.of(context).textTheme.titleLarge?.color),
               const SizedBox(width: 8),
-
               Text(
                 '근육 회복 상태',
-                style: TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-
-                  color: isDark ? Colors.white : Colors.black,
-
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ],
           ),
           const SizedBox(height: 16),
 
-          _buildMuscleRecoveryView(recoveryStatus, isDark),
+          _buildMuscleRecoveryView(context, recoveryStatus, isDark),
 
         ],
       ),
@@ -83,8 +76,9 @@ class MuscleRecoverySection extends StatelessWidget {
   }
 
   Widget _buildMuscleRecoveryView(
-
-      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus, bool isDark) {
+      BuildContext context,
+      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus,
+      bool isDark) {
 
     return SizedBox(
       height: 400,
@@ -106,15 +100,11 @@ class MuscleRecoverySection extends StatelessWidget {
                 children: [
 
                   Text(
-
                     '회복 상태',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-
-                      color: isDark ? Colors.white : Colors.black,
-
-                    ),
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 16),
                   Expanded(
@@ -145,7 +135,6 @@ class MuscleRecoverySection extends StatelessWidget {
 
     return Card(
       margin: const EdgeInsets.only(bottom: 8),
-
       color: isDark ? Colors.grey[800] : Colors.white,
 
       child: Padding(
@@ -158,12 +147,10 @@ class MuscleRecoverySection extends StatelessWidget {
               children: [
                 Text(
                   _getMuscleGroupName(info.muscleGroup),
-
-                  style: TextStyle(
-                    color: isDark ? Colors.white : Colors.black,
-
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
                 ),
                 Container(
                   padding:
@@ -190,12 +177,7 @@ class MuscleRecoverySection extends StatelessWidget {
             const SizedBox(height: 4),
             Text(
               recoveryHours > 0 ? '회복까지 $recoveryHours시간' : '회복 완료',
-
-              style: TextStyle(
-                color: isDark ? Colors.grey[400] : Colors.grey[700],
-                fontSize: 12,
-              ),
-
+              style: Theme.of(context).textTheme.bodySmall,
             ),
           ],
         ),
