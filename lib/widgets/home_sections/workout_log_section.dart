@@ -59,7 +59,10 @@ class WorkoutLogSection extends StatelessWidget {
               const SizedBox(height: 16),
               Text(
                 '이 날의 운동 기록이 없습니다',
-                style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodySmall
+                    ?.copyWith(fontSize: 16),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
@@ -94,7 +97,10 @@ class WorkoutLogSection extends StatelessWidget {
             ),
             title: Text(
               workout.exercise,
-              style: const TextStyle(fontWeight: FontWeight.bold),
+              style: Theme.of(context)
+                  .textTheme
+                  .bodyLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
             ),
             subtitle: Text('${workout.sets} | ${workout.details}'),
             trailing: Row(
