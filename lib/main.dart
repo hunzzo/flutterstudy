@@ -6,6 +6,7 @@ import 'providers/workout_data.dart';
 import 'providers/theme_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const WorkoutApp());
 }
 

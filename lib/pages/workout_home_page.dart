@@ -8,6 +8,7 @@ import '../widgets/home_sections/scroll_hint_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
+import 'package:provider/provider.dart';
 
 import 'package:provider/provider.dart';
 
@@ -32,23 +33,34 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('운동 기록'),
-        backgroundColor: Colors.blue[600],
+
+        backgroundColor: Theme.of(context).colorScheme.primary,
         elevation: 0,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.settings),
-
-            onPressed: () {
-              Navigator.of(
-                context,
-              ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
+          PopupMenuButton<String>(
+            onSelected: (value) {
+              if (value == 'settings') {
+                Navigator.of(context).push(
+                  MaterialPageRoute(builder: (_) => const SettingsPage()),
+                );
+              }
             },
+            itemBuilder: (context) => const [
+              PopupMenuItem(
+                value: 'settings',
+                child: Text('설정'),
+              ),
+            ],
+
           ),
         ],
       ),
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(child: MuscleRecoverySection()),
+
+          const SliverToBoxAdapter(
+            child: MuscleRecoverySection(),
+          ),
           SliverToBoxAdapter(
             child: CalendarSection(
               calendarFormat: _calendarFormat,
@@ -70,8 +82,11 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
               },
             ),
           ),
-          const SliverToBoxAdapter(child: ScrollHintSection()),
+          const SliverToBoxAdapter(
+            child: ScrollHintSection(),
+          ),
           SliverToBoxAdapter(
+
             child: WorkoutLogSection(
               selectedDay: _selectedDay,
               onAddWorkout: _showAddWorkoutDialog,
@@ -179,9 +194,10 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                       Navigator.of(context).pop();
                     }
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.blue[600],
-                  ),
+
+                  style:
+                      ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),
+
                   child: const Text('추가'),
                 ),
               ],
