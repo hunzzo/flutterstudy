@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
 
 import '../models/workout.dart';
 
 class WorkoutData extends ChangeNotifier {
+  static const String _storageKey = 'workoutData';
+
   final Map<DateTime, List<WorkoutRecord>> _workoutData = {
     DateTime.now(): [
       WorkoutRecord('벤치프레스', '3세트', '80kg x 10회', MuscleGroup.chest, 8),
@@ -21,6 +25,10 @@ class WorkoutData extends ChangeNotifier {
     ],
   };
 
+  WorkoutData() {
+    _loadData();
+  }
+
   List<WorkoutRecord> workoutsForDay(DateTime day) {
     final key = DateTime(day.year, day.month, day.day);
     return _workoutData[key] ?? [];
@@ -33,11 +41,38 @@ class WorkoutData extends ChangeNotifier {
     }
     _workoutData[key]!.add(record);
     notifyListeners();
+    _saveData();
   }
 
   void deleteWorkout(DateTime day, int index) {
     final key = DateTime(day.year, day.month, day.day);
     _workoutData[key]?.removeAt(index);
     notifyListeners();
+    _saveData();
+  }
+
+  Future<void> _loadData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_storageKey);
+    if (jsonString == null) return;
+
+    final Map<String, dynamic> jsonData = jsonDecode(jsonString);
+    _workoutData.clear();
+    jsonData.forEach((key, value) {
+      final date = DateTime.parse(key);
+      final List<dynamic> list = value as List<dynamic>;
+      _workoutData[date] =
+          list.map((e) => WorkoutRecord.fromJson(e as Map<String, dynamic>)).toList();
+    });
+    notifyListeners();
+  }
+
+  Future<void> _saveData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final Map<String, dynamic> jsonData = {};
+    _workoutData.forEach((key, value) {
+      jsonData[key.toIso8601String()] = value.map((e) => e.toJson()).toList();
+    });
+    await prefs.setString(_storageKey, jsonEncode(jsonData));
   }
 }
