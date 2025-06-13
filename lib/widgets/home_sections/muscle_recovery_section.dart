@@ -87,9 +87,9 @@ class MuscleRecoverySection extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            flex: 2,
-            child: CustomPaint(
-              painter: BodyPainter(recoveryStatus),
+                              context, recoveryStatus[muscle]!, isDark))
+  Widget _buildMuscleInfoCard(
+      BuildContext context, MuscleRecoveryInfo info, bool isDark) {
               child: Container(),
             ),
           ),
