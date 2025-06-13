@@ -11,9 +11,6 @@ import '../providers/workout_data.dart';
 
 import 'package:provider/provider.dart';
 
-import 'settings_page.dart';
-
-
 class WorkoutHomePage extends StatefulWidget {
   @override
   _WorkoutHomePageState createState() => _WorkoutHomePageState();
@@ -39,24 +36,19 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
         elevation: 0,
         actions: [
           IconButton(
-
             icon: const Icon(Icons.settings),
 
-            icon: Icon(Icons.settings),
- main
             onPressed: () {
-              Navigator.of(context).push(
-                MaterialPageRoute(builder: (_) => const SettingsPage()),
-              );
+              Navigator.of(
+                context,
+              ).push(MaterialPageRoute(builder: (_) => const SettingsPage()));
             },
           ),
         ],
       ),
       body: CustomScrollView(
         slivers: [
-          const SliverToBoxAdapter(
-            child: MuscleRecoverySection(),
-          ),
+          const SliverToBoxAdapter(child: MuscleRecoverySection()),
           SliverToBoxAdapter(
             child: CalendarSection(
               calendarFormat: _calendarFormat,
@@ -78,9 +70,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
               },
             ),
           ),
-          const SliverToBoxAdapter(
-            child: ScrollHintSection(),
-          ),
+          const SliverToBoxAdapter(child: ScrollHintSection()),
           SliverToBoxAdapter(
             child: WorkoutLogSection(
               selectedDay: _selectedDay,
@@ -189,8 +179,9 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
                       Navigator.of(context).pop();
                     }
                   },
-                  style:
-                      ElevatedButton.styleFrom(backgroundColor: Colors.blue[600]),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.blue[600],
+                  ),
                   child: const Text('추가'),
                 ),
               ],
