@@ -45,10 +45,18 @@ class CalendarSection extends StatelessWidget {
             calendarFormat: calendarFormat,
             eventLoader: (day) => _getWorkoutsForDay(context, day),
             startingDayOfWeek: StartingDayOfWeek.monday,
-            calendarStyle: const CalendarStyle(
+            calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
-              markerDecoration: BoxDecoration(
+              markerDecoration: const BoxDecoration(
                 color: Colors.orange,
+                shape: BoxShape.circle,
+              ),
+              selectedDecoration: BoxDecoration(
+                color: Colors.blue[600],
+                shape: BoxShape.circle,
+              ),
+              todayDecoration: BoxDecoration(
+                color: Colors.blue[300],
                 shape: BoxShape.circle,
               ),
             ),
@@ -66,14 +74,6 @@ class CalendarSection extends StatelessWidget {
             onDaySelected: onDaySelected,
             onFormatChanged: onFormatChanged,
             onPageChanged: onPageChanged,
-            selectedDecoration: BoxDecoration(
-              color: Colors.blue[600],
-              shape: BoxShape.circle,
-            ),
-            todayDecoration: BoxDecoration(
-              color: Colors.blue[300],
-              shape: BoxShape.circle,
-            ),
           ),
         ),
       ),

@@ -47,8 +47,9 @@ class MuscleRecoverySection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
 
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    return Container(
+      final isDark = Theme.of(context).brightness == Brightness.dark;
+      final recoveryStatus = _getMuscleRecoveryStatus(context);
+      return Container(
       color: isDark ? Colors.grey[900] : Colors.grey[100],
 
       padding: const EdgeInsets.all(16),
@@ -188,7 +189,7 @@ class MuscleRecoverySection extends StatelessWidget {
             ),
             const SizedBox(height: 4),
             Text(
-              recoveryHours > 0 ? '회복까지 ${recoveryHours}시간' : '회복 완료',
+              recoveryHours > 0 ? '회복까지 $recoveryHours시간' : '회복 완료',
 
               style: TextStyle(
                 color: isDark ? Colors.grey[400] : Colors.grey[700],
@@ -237,8 +238,6 @@ class MuscleRecoverySection extends StatelessWidget {
         return '다리';
       case MuscleGroup.core:
         return '코어';
-      default:
-        return '';
     }
   }
 }
