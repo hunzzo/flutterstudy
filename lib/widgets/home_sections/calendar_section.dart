@@ -34,7 +34,7 @@ class CalendarSection extends StatelessWidget {
     return Container(
       color: isDark
           ? Colors.grey[850]
-          : Theme.of(context).colorScheme.primary.withOpacity(0.1),
+          : Theme.of(context).colorScheme.primary.withAlpha(26),
       padding: const EdgeInsets.all(16),
       child: Card(
         elevation: 4,
@@ -59,7 +59,7 @@ class CalendarSection extends StatelessWidget {
               ),
               todayDecoration: BoxDecoration(
                 color:
-                    Theme.of(context).colorScheme.primary.withOpacity(0.7),
+                    Theme.of(context).colorScheme.primary.withAlpha(179),
                 shape: BoxShape.circle,
               ),
             ),
