@@ -11,7 +11,7 @@ import '../providers/workout_data.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutHomePage extends StatefulWidget {
-  const WorkoutHomePage({Key? key}) : super(key: key);
+  const WorkoutHomePage({super.key});
 
   @override
   WorkoutHomePageState createState() => WorkoutHomePageState();
