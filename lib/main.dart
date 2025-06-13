@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 
 import 'pages/workout_home_page.dart';
 import 'providers/workout_data.dart';
+import 'providers/theme_provider.dart';
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(const WorkoutApp());
 }
 
@@ -13,15 +15,24 @@ class WorkoutApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => WorkoutData(),
-      child: MaterialApp(
-        title: '운동 기록',
-        theme: ThemeData(
-          primarySwatch: Colors.blue,
-          visualDensity: VisualDensity.adaptivePlatformDensity,
-        ),
-        home: WorkoutHomePage(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => WorkoutData()),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: Consumer<ThemeProvider>(
+        builder: (context, themeProvider, _) {
+          return MaterialApp(
+            title: '운동 기록',
+            theme: ThemeData(
+              primarySwatch: Colors.blue,
+              visualDensity: VisualDensity.adaptivePlatformDensity,
+            ),
+            darkTheme: ThemeData.dark(),
+            themeMode: themeProvider.themeMode,
+            home: WorkoutHomePage(),
+          );
+        },
       ),
     );
   }
