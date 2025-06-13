@@ -15,6 +15,12 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
+## Data Persistence
+
+Workout records are now stored locally using the
+[shared_preferences](https://pub.dev/packages/shared_preferences) package.
+This allows the app to retain your workout history between sessions.
+
 ## Running Tests
 
 Run all tests with:
