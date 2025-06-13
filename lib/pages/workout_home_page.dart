@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 import '../models/workout.dart';
 import '../widgets/body_painter.dart';
+import '../providers/workout_data.dart';
 
 class WorkoutHomePage extends StatefulWidget {
   @override
@@ -14,25 +16,6 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
 
-  // 예시 운동 데이터
-  Map<DateTime, List<WorkoutRecord>> _workoutData = {
-    DateTime.now(): [
-      WorkoutRecord('벤치프레스', '3세트', '80kg x 10회', MuscleGroup.chest, 8),
-      WorkoutRecord('스쿼트', '4세트', '100kg x 8회', MuscleGroup.legs, 9),
-      WorkoutRecord('데드리프트', '3세트', '120kg x 5회', MuscleGroup.back, 9),
-    ],
-    DateTime.now().subtract(Duration(days: 1)): [
-      WorkoutRecord('풀업', '3세트', '체중 x 12회', MuscleGroup.back, 7),
-      WorkoutRecord('딥스', '3세트', '체중 x 15회', MuscleGroup.chest, 6),
-      WorkoutRecord('어깨 프레스', '4세트', '40kg x 12회', MuscleGroup.shoulders, 8),
-    ],
-    DateTime.now().subtract(Duration(days: 2)): [
-      WorkoutRecord('바이셉 컬', '3세트', '15kg x 15회', MuscleGroup.arms, 6),
-      WorkoutRecord('트라이셉 딥', '3세트', '체중 x 12회', MuscleGroup.arms, 7),
-      WorkoutRecord('레그 프레스', '4세트', '150kg x 12회', MuscleGroup.legs, 8),
-    ],
-  };
-
   @override
   void initState() {
     super.initState();
@@ -40,7 +23,8 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
   }
 
   List<WorkoutRecord> _getWorkoutsForDay(DateTime day) {
-    return _workoutData[DateTime(day.year, day.month, day.day)] ?? [];
+    final provider = Provider.of<WorkoutData>(context, listen: false);
+    return provider.workoutsForDay(day);
   }
 
   Map<MuscleGroup, MuscleRecoveryInfo> _getMuscleRecoveryStatus() {
@@ -403,7 +387,8 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
   }
 
   Widget _buildWorkoutList() {
-    final workouts = _getWorkoutsForDay(_selectedDay ?? DateTime.now());
+    final provider = Provider.of<WorkoutData>(context);
+    final workouts = provider.workoutsForDay(_selectedDay ?? DateTime.now());
 
     if (workouts.isEmpty) {
       return Container(
@@ -601,14 +586,11 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
       _selectedDay!.day,
     );
 
-    setState(() {
-      if (_workoutData[selectedDate] == null) {
-        _workoutData[selectedDate] = [];
-      }
-      _workoutData[selectedDate]!.add(
-        WorkoutRecord(exercise, sets, details, muscle, intensity),
-      );
-    });
+    final provider = Provider.of<WorkoutData>(context, listen: false);
+    provider.addWorkout(
+      selectedDate,
+      WorkoutRecord(exercise, sets, details, muscle, intensity),
+    );
   }
 
   void _deleteWorkout(int index) {
@@ -618,8 +600,7 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
       _selectedDay!.day,
     );
 
-    setState(() {
-      _workoutData[selectedDate]?.removeAt(index);
-    });
+    final provider = Provider.of<WorkoutData>(context, listen: false);
+    provider.deleteWorkout(selectedDate, index);
   }
 }
