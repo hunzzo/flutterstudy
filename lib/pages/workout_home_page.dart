@@ -10,14 +10,14 @@ import 'settings_page.dart';
 import '../providers/workout_data.dart';
 import 'package:provider/provider.dart';
 
-import 'package:provider/provider.dart';
-
 class WorkoutHomePage extends StatefulWidget {
+  const WorkoutHomePage({Key? key}) : super(key: key);
+
   @override
-  _WorkoutHomePageState createState() => _WorkoutHomePageState();
+  WorkoutHomePageState createState() => WorkoutHomePageState();
 }
 
-class _WorkoutHomePageState extends State<WorkoutHomePage> {
+class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;

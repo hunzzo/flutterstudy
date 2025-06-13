@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../../models/workout.dart';
 import '../../providers/workout_data.dart';
 
 class WorkoutLogSection extends StatelessWidget {
@@ -67,10 +66,10 @@ class WorkoutLogSection extends StatelessWidget {
               const SizedBox(height: 8),
               ElevatedButton(
                 onPressed: onAddWorkout,
-                child: const Text('운동 기록 추가'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.blue[600],
                 ),
+                child: const Text('운동 기록 추가'),
               ),
             ],
           ),
