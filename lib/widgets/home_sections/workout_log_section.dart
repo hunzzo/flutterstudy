@@ -26,16 +26,14 @@ class WorkoutLogSection extends StatelessWidget {
         children: [
           Row(
             children: [
-              Icon(Icons.fitness_center, color: Colors.blue[600]),
+              Icon(Icons.fitness_center,
+                  color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
                 selectedDay != null
                     ? '${selectedDay!.month}월 ${selectedDay!.day}일 운동 기록'
                     : '오늘의 운동 기록',
-                style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: Theme.of(context).textTheme.titleLarge,
               ),
             ],
           ),
@@ -67,7 +65,8 @@ class WorkoutLogSection extends StatelessWidget {
               ElevatedButton(
                 onPressed: onAddWorkout,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue[600],
+                  backgroundColor:
+                      Theme.of(context).colorScheme.primary,
                 ),
                 child: const Text('운동 기록 추가'),
               ),
@@ -88,8 +87,10 @@ class WorkoutLogSection extends StatelessWidget {
           elevation: 2,
           child: ListTile(
             leading: CircleAvatar(
-              backgroundColor: Colors.blue[100],
-              child: Icon(Icons.fitness_center, color: Colors.blue[600]),
+              backgroundColor:
+                  Theme.of(context).colorScheme.primary.withOpacity(0.2),
+              child: Icon(Icons.fitness_center,
+                  color: Theme.of(context).colorScheme.primary),
             ),
             title: Text(
               workout.exercise,
