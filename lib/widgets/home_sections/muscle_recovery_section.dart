@@ -62,7 +62,9 @@ class MuscleRecoverySection extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '근육 회복 상태',
+
                 style: Theme.of(context).textTheme.titleLarge,
+
               ),
             ],
           ),
@@ -104,7 +106,9 @@ class MuscleRecoverySection extends StatelessWidget {
                     style: Theme.of(context)
                         .textTheme
                         .titleMedium
+
                         ?.copyWith(fontWeight: FontWeight.bold),
+
                   ),
                   const SizedBox(height: 16),
                   Expanded(

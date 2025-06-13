@@ -5,6 +5,7 @@ class AppColors {
   static const Color secondary = Color(0xFFFF9800); // orange
   static const Color hint = Colors.grey;
 
+
   static const Color lightTextMain = Colors.black87;
   static const Color lightTextFaded = Colors.black54;
   static const Color darkTextMain = Colors.white;
@@ -21,6 +22,7 @@ class AppTheme {
           brightness: Brightness.light,
         ),
         textTheme: const TextTheme(
+
           titleLarge: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -29,6 +31,7 @@ class AppTheme {
           bodyLarge: TextStyle(color: AppColors.lightTextMain),
           bodyMedium: TextStyle(color: AppColors.lightTextMain),
           bodySmall: TextStyle(color: AppColors.lightTextFaded),
+>>>> main
         ),
         useMaterial3: true,
       );
@@ -41,6 +44,7 @@ class AppTheme {
           brightness: Brightness.dark,
         ),
         textTheme: const TextTheme(
+
           titleLarge: TextStyle(
             fontSize: 20,
             fontWeight: FontWeight.bold,
@@ -49,6 +53,7 @@ class AppTheme {
           bodyLarge: TextStyle(color: AppColors.darkTextMain),
           bodyMedium: TextStyle(color: AppColors.darkTextMain),
           bodySmall: TextStyle(color: AppColors.darkTextFaded),
+
         ),
         useMaterial3: true,
       );
