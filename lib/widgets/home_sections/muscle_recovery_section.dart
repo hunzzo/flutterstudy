@@ -72,7 +72,7 @@ class MuscleRecoverySection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
 
-          _buildMuscleRecoveryView(recoveryStatus, isDark),
+          _buildMuscleRecoveryView(context, recoveryStatus, isDark),
 
         ],
       ),
@@ -80,8 +80,9 @@ class MuscleRecoverySection extends StatelessWidget {
   }
 
   Widget _buildMuscleRecoveryView(
-
-      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus, bool isDark) {
+      BuildContext context,
+      Map<MuscleGroup, MuscleRecoveryInfo> recoveryStatus,
+      bool isDark) {
 
     return SizedBox(
       height: 400,
