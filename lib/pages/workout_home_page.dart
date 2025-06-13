@@ -5,6 +5,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../models/workout.dart';
 import '../widgets/body_painter.dart';
 import '../providers/workout_data.dart';
+import 'settings_page.dart';
 
 class WorkoutHomePage extends StatefulWidget {
   @override
@@ -67,6 +68,16 @@ class _WorkoutHomePageState extends State<WorkoutHomePage> {
         title: Text('운동 기록'),
         backgroundColor: Colors.blue[600],
         elevation: 0,
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings),
+            onPressed: () {
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (_) => const SettingsPage()),
+              );
+            },
+          ),
+        ],
       ),
       body: CustomScrollView(
         slivers: [
