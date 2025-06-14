@@ -51,6 +51,22 @@ class WorkoutData extends ChangeNotifier {
     _saveData();
   }
 
+  WorkoutRecord? latestRecordForExercise(String exercise) {
+    DateTime? latestDate;
+    WorkoutRecord? latest;
+    _workoutData.forEach((date, records) {
+      for (final r in records) {
+        if (r.exercise == exercise) {
+          if (latestDate == null || date.isAfter(latestDate!)) {
+            latestDate = date;
+            latest = r;
+          }
+        }
+      }
+    });
+    return latest;
+  }
+
   Future<void> _loadData() async {
     final prefs = await SharedPreferences.getInstance();
     final jsonString = prefs.getString(_storageKey);
