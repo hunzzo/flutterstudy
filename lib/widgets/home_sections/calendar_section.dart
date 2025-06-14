@@ -31,6 +31,7 @@ class CalendarSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final textColor = Theme.of(context).textTheme.bodyMedium?.color;
     return Container(
       color: isDark
           ? Colors.grey[850]
@@ -49,6 +50,10 @@ class CalendarSection extends StatelessWidget {
             startingDayOfWeek: StartingDayOfWeek.monday,
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
+              defaultTextStyle: TextStyle(color: textColor),
+              weekendTextStyle: TextStyle(color: textColor),
+              outsideTextStyle:
+                  TextStyle(color: textColor?.withOpacity(0.5)),
               markerDecoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.secondary,
                 shape: BoxShape.circle,
@@ -67,6 +72,8 @@ class CalendarSection extends StatelessWidget {
               formatButtonVisible: true,
               titleCentered: true,
               formatButtonShowsNext: false,
+              titleTextStyle:
+                  Theme.of(context).textTheme.titleMedium ?? const TextStyle(),
               formatButtonDecoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.primary,
                 borderRadius: BorderRadius.circular(20),
