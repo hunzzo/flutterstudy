@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
+import '../widgets/home_sections/muscle_recovery_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
 import 'add_workout_page.dart';
@@ -20,8 +21,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
+  final PageController _pageController = PageController(initialPage: 1);
+  int _currentPage = 1;
 
   @override
   void initState() {
@@ -61,6 +62,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
         scrollDirection: Axis.vertical,
         onPageChanged: (index) => setState(() => _currentPage = index),
         children: [
+          const MuscleRecoverySection(),
           CalendarSection(
             calendarFormat: _calendarFormat,
             focusedDay: _focusedDay,
@@ -75,6 +77,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                   _focusedDay = focusedDay;
                 });
               }
+              _showWorkoutPreview(selectedDay);
             },
             onPageChanged: (focusedDay) {
               _focusedDay = focusedDay;
@@ -139,6 +142,34 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
 
     final provider = Provider.of<WorkoutData>(context, listen: false);
     provider.deleteWorkout(selectedDate, index);
+  }
+
+  void _showWorkoutPreview(DateTime day) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (_) {
+        return DraggableScrollableSheet(
+          initialChildSize: 0.4,
+          maxChildSize: 0.9,
+          builder: (context, controller) {
+            return Material(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(16)),
+              child: SingleChildScrollView(
+                controller: controller,
+                child: WorkoutLogSection(
+                  selectedDay: day,
+                  onAddWorkout: _openAddWorkoutPage,
+                  onDeleteWorkout: _deleteWorkout,
+                ),
+              ),
+            );
+          },
+        );
+      },
+    );
   }
 
   @override

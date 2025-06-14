@@ -15,6 +15,7 @@ class WorkoutRecord {
   final String details;
   final MuscleGroup muscleGroup;
   final int intensity; // 1-10 scale
+  final List<SetEntry> setDetails;
 
   WorkoutRecord(
     this.exercise,
@@ -22,7 +23,8 @@ class WorkoutRecord {
     this.details,
     this.muscleGroup,
     this.intensity,
-  );
+    [List<SetEntry>? setDetails]
+  ) : setDetails = setDetails ?? [];
 
   Map<String, dynamic> toJson() => {
         'exercise': exercise,
@@ -30,6 +32,7 @@ class WorkoutRecord {
         'details': details,
         'muscleGroup': muscleGroup.name,
         'intensity': intensity,
+        'setDetails': setDetails.map((e) => e.toJson()).toList(),
       };
 
   factory WorkoutRecord.fromJson(Map<String, dynamic> json) {
@@ -39,6 +42,32 @@ class WorkoutRecord {
       json['details'] as String,
       MuscleGroupExtension.fromName(json['muscleGroup'] as String),
       json['intensity'] as int,
+      (json['setDetails'] as List<dynamic>?)
+              ?.map((e) => SetEntry.fromJson(e as Map<String, dynamic>))
+              .toList() ??
+          [],
+    );
+  }
+}
+
+class SetEntry {
+  final double weight;
+  final int reps;
+  final bool done;
+
+  SetEntry(this.weight, this.reps, {this.done = false});
+
+  Map<String, dynamic> toJson() => {
+        'w': weight,
+        'r': reps,
+        'd': done,
+      };
+
+  factory SetEntry.fromJson(Map<String, dynamic> json) {
+    return SetEntry(
+      (json['w'] as num).toDouble(),
+      json['r'] as int,
+      done: json['d'] as bool? ?? false,
     );
   }
 }

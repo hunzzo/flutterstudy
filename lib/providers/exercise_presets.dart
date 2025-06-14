@@ -3,8 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/workout.dart';
+
 class ExercisePresets extends ChangeNotifier {
   static const String _storageKey = 'exercisePresets';
+  static const String _favoritesKey = 'exerciseFavorites';
 
   List<String> _presets = [
     'Bench Press',
@@ -109,8 +112,11 @@ class ExercisePresets extends ChangeNotifier {
     'T-Bar Row',
   ];
 
+  Set<String> _favorites = {};
+
   ExercisePresets() {
     _loadPresets();
+    _loadFavorites();
   }
 
   List<String> get presets => List.unmodifiable(_presets);
@@ -136,5 +142,56 @@ class ExercisePresets extends ChangeNotifier {
   Future<void> _savePresets() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString(_storageKey, jsonEncode(_presets));
+  }
+
+  // --- Favorites management ---
+  bool isFavorite(String exercise) => _favorites.contains(exercise);
+
+  void toggleFavorite(String exercise) {
+    if (_favorites.contains(exercise)) {
+      _favorites.remove(exercise);
+    } else {
+      _favorites.add(exercise);
+    }
+    _saveFavorites();
+    notifyListeners();
+  }
+
+  Future<void> _loadFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    final jsonString = prefs.getString(_favoritesKey);
+    if (jsonString != null) {
+      final List<dynamic> list = jsonDecode(jsonString);
+      _favorites = list.cast<String>().toSet();
+    }
+  }
+
+  Future<void> _saveFavorites() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_favoritesKey, jsonEncode(_favorites.toList()));
+  }
+
+  /// Utility to guess muscle group based on exercise name
+  MuscleGroup muscleGroupFor(String exercise) {
+    final name = exercise.toLowerCase();
+    if (name.contains('bench') || name.contains('chest') || name.contains('fly')) {
+      return MuscleGroup.chest;
+    }
+    if (name.contains('squat') || name.contains('lunge') || name.contains('leg') || name.contains('calf')) {
+      return MuscleGroup.legs;
+    }
+    if (name.contains('shoulder') || name.contains('press') && name.contains('overhead') || name.contains('delt')) {
+      return MuscleGroup.shoulders;
+    }
+    if (name.contains('row') || name.contains('pull') || name.contains('deadlift') || name.contains('back')) {
+      return MuscleGroup.back;
+    }
+    if (name.contains('bicep') || name.contains('tricep') || name.contains('curl')) {
+      return MuscleGroup.arms;
+    }
+    if (name.contains('ab') || name.contains('plank') || name.contains('core')) {
+      return MuscleGroup.core;
+    }
+    return MuscleGroup.chest;
   }
 }

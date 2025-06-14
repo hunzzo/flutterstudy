@@ -91,4 +91,39 @@ class WorkoutData extends ChangeNotifier {
     });
     await prefs.setString(_storageKey, jsonEncode(jsonData));
   }
+
+  void addSet(DateTime day, int workoutIndex, SetEntry set) {
+    final key = DateTime(day.year, day.month, day.day);
+    final workout = _workoutData[key]?[workoutIndex];
+    if (workout != null) {
+      workout.setDetails.add(set);
+      notifyListeners();
+      _saveData();
+    }
+  }
+
+  void toggleSetDone(DateTime day, int workoutIndex, int setIndex) {
+    final key = DateTime(day.year, day.month, day.day);
+    final workout = _workoutData[key]?[workoutIndex];
+    if (workout != null && setIndex < workout.setDetails.length) {
+      final current = workout.setDetails[setIndex];
+      workout.setDetails[setIndex] = SetEntry(
+        current.weight,
+        current.reps,
+        done: !current.done,
+      );
+      notifyListeners();
+      _saveData();
+    }
+  }
+
+  int exerciseCount(String exercise) {
+    int count = 0;
+    _workoutData.forEach((_, list) {
+      for (final r in list) {
+        if (r.exercise == exercise) count++;
+      }
+    });
+    return count;
+  }
 }
