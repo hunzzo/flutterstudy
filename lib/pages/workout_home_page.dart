@@ -113,25 +113,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     );
   }
 
-  void _addWorkout(
-    String exercise,
-    String sets,
-    String details,
-    MuscleGroup muscle,
-    int intensity,
-  ) {
-    final selectedDate = DateTime(
-      _selectedDay!.year,
-      _selectedDay!.month,
-      _selectedDay!.day,
-    );
-
-    final provider = Provider.of<WorkoutData>(context, listen: false);
-    provider.addWorkout(
-      selectedDate,
-      WorkoutRecord(exercise, sets, details, muscle, intensity),
-    );
-  }
 
   void _deleteWorkout(int index) {
     final selectedDate = DateTime(
