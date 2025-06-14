@@ -2,8 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../providers/workout_data.dart';
+import '../../models/workout.dart';
 
-class WorkoutLogSection extends StatelessWidget {
+class WorkoutLogSection extends StatefulWidget {
   final DateTime? selectedDay;
   final VoidCallback onAddWorkout;
   final void Function(int) onDeleteWorkout;
@@ -15,6 +16,11 @@ class WorkoutLogSection extends StatelessWidget {
     required this.onDeleteWorkout,
   });
 
+  @override
+  State<WorkoutLogSection> createState() => _WorkoutLogSectionState();
+}
+
+class _WorkoutLogSectionState extends State<WorkoutLogSection> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
@@ -30,8 +36,8 @@ class WorkoutLogSection extends StatelessWidget {
                   color: Theme.of(context).colorScheme.primary),
               const SizedBox(width: 8),
               Text(
-                selectedDay != null
-                    ? '${selectedDay!.month}월 ${selectedDay!.day}일 운동 기록'
+                widget.selectedDay != null
+                    ? '${widget.selectedDay!.month}월 ${widget.selectedDay!.day}일 운동 기록'
                     : '오늘의 운동 기록',
                 style: Theme.of(context).textTheme.titleLarge,
               ),
@@ -46,7 +52,7 @@ class WorkoutLogSection extends StatelessWidget {
 
   Widget _buildWorkoutList(BuildContext context) {
     final provider = Provider.of<WorkoutData>(context);
-    final workouts = provider.workoutsForDay(selectedDay ?? DateTime.now());
+    final workouts = provider.workoutsForDay(widget.selectedDay ?? DateTime.now());
 
     if (workouts.isEmpty) {
       return SizedBox(
@@ -88,40 +94,69 @@ class WorkoutLogSection extends StatelessWidget {
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
           elevation: 2,
-          child: ListTile(
-            leading: CircleAvatar(
-              backgroundColor:
-                  Theme.of(context).colorScheme.primary.withAlpha(51),
-              child: Icon(Icons.fitness_center,
-                  color: Theme.of(context).colorScheme.primary),
-            ),
-            title: Text(
-              workout.exercise,
-              style: Theme.of(context)
-                  .textTheme
-                  .bodyLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text('${workout.sets} | ${workout.details}'),
-            trailing: Row(
-              mainAxisSize: MainAxisSize.min,
+          child: Padding(
+            padding: const EdgeInsets.all(8),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: _getIntensityColor(workout.intensity),
-                    borderRadius: BorderRadius.circular(12),
+                ListTile(
+                  contentPadding: EdgeInsets.zero,
+                  leading: CircleAvatar(
+                    backgroundColor:
+                        Theme.of(context).colorScheme.primary.withAlpha(51),
+                    child: Icon(Icons.fitness_center,
+                        color: Theme.of(context).colorScheme.primary),
                   ),
-                  child: Text(
-                    '강도 ${workout.intensity}',
-                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  title: Text(
+                    workout.exercise,
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodyLarge
+                        ?.copyWith(fontWeight: FontWeight.bold),
+                  ),
+                  subtitle: Text('${workout.sets} | ${workout.details}'),
+                  trailing: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: _getIntensityColor(workout.intensity),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          '강도 ${workout.intensity}',
+                          style:
+                              const TextStyle(color: Colors.white, fontSize: 12),
+                        ),
+                      ),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed: () => _showAddSetDialog(context, index),
+                      ),
+                      IconButton(
+                        icon: Icon(Icons.delete, color: Colors.red[400]),
+                        onPressed: () => onDeleteWorkout(index),
+                      ),
+                    ],
                   ),
                 ),
-                const SizedBox(width: 8),
-                IconButton(
-                  icon: Icon(Icons.delete, color: Colors.red[400]),
-                  onPressed: () => onDeleteWorkout(index),
+                Wrap(
+                  spacing: 4,
+                  children: [
+                    for (int i = 0; i < workout.setDetails.length; i++)
+                      ChoiceChip(
+                        label: Text(
+                            '${workout.setDetails[i].weight}kg x ${workout.setDetails[i].reps}'),
+                        selected: workout.setDetails[i].done,
+                        onSelected: (_) {
+                          Provider.of<WorkoutData>(context, listen: false)
+                              .toggleSetDone(widget.selectedDay ?? DateTime.now(), index, i);
+                          _startRestTimer(context);
+                        },
+                      ),
+                  ],
                 ),
               ],
             ),
@@ -135,5 +170,61 @@ class WorkoutLogSection extends StatelessWidget {
     if (intensity <= 3) return Colors.green;
     if (intensity <= 6) return Colors.orange;
     return Colors.red;
+  }
+
+  void _showAddSetDialog(BuildContext context, int workoutIndex) async {
+    final weightController = TextEditingController();
+    final repsController = TextEditingController();
+    final result = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text('세트 추가'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: weightController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: '무게(kg)'),
+            ),
+            TextField(
+              controller: repsController,
+              keyboardType: TextInputType.number,
+              decoration: const InputDecoration(labelText: '횟수'),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('취소'),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('추가'),
+          ),
+        ],
+      ),
+    );
+
+    if (result == true) {
+      final weight = double.tryParse(weightController.text) ?? 0;
+      final reps = int.tryParse(repsController.text) ?? 0;
+      Provider.of<WorkoutData>(context, listen: false).addSet(
+          widget.selectedDay ?? DateTime.now(),
+          workoutIndex,
+          SetEntry(weight, reps));
+    }
+  }
+
+  void _startRestTimer(BuildContext context) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('휴식 시작!'), duration: Duration(seconds: 1)),
+    );
+    Future.delayed(const Duration(seconds: 60), () {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('휴식 종료'), duration: Duration(seconds: 1)),
+      );
+    });
   }
 }
