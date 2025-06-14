@@ -109,12 +109,11 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           controller: _scrollController,
           slivers: [
             SliverToBoxAdapter(
-              key: _recoveryKey,
-              child: const MuscleRecoverySection(),
+              child: MuscleRecoverySection(key: _recoveryKey),
             ),
             SliverToBoxAdapter(
-              key: _calendarKey,
               child: CalendarSection(
+                key: _calendarKey,
                 calendarFormat: _calendarFormat,
                 focusedDay: _focusedDay,
                 selectedDay: _selectedDay,
@@ -134,13 +133,12 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                 },
               ),
             ),
-            const SliverToBoxAdapter(
-              key: _hintKey,
-              child: ScrollHintSection(),
+            SliverToBoxAdapter(
+              child: ScrollHintSection(key: _hintKey),
             ),
             SliverToBoxAdapter(
-              key: _logKey,
               child: WorkoutLogSection(
+                key: _logKey,
                 selectedDay: _selectedDay,
                 onAddWorkout: _showAddWorkoutDialog,
                 onDeleteWorkout: _deleteWorkout,
