@@ -29,6 +29,10 @@ class AppTheme {
           bodyMedium: TextStyle(color: AppColors.lightTextMain),
           bodySmall: TextStyle(color: AppColors.lightTextFaded),
         ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+        ),
         useMaterial3: true,
       );
 
@@ -48,6 +52,10 @@ class AppTheme {
           bodyLarge: TextStyle(color: AppColors.darkTextMain),
           bodyMedium: TextStyle(color: AppColors.darkTextMain),
           bodySmall: TextStyle(color: AppColors.darkTextFaded),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
         ),
         useMaterial3: true,
       );

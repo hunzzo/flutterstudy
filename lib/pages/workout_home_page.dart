@@ -8,6 +8,7 @@ import '../widgets/home_sections/scroll_hint_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
+import '../providers/exercise_presets.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutHomePage extends StatefulWidget {
@@ -21,11 +22,54 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
+  final ScrollController _scrollController = ScrollController();
+  final GlobalKey _recoveryKey = GlobalKey();
+  final GlobalKey _calendarKey = GlobalKey();
+  final GlobalKey _hintKey = GlobalKey();
+  final GlobalKey _logKey = GlobalKey();
+  List<double> _sectionOffsets = [];
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _updateOffsets());
+  }
+
+  void _updateOffsets() {
+    _sectionOffsets = [];
+    double offset = 0;
+    final contexts = [
+      _recoveryKey.currentContext,
+      _calendarKey.currentContext,
+      _hintKey.currentContext,
+      _logKey.currentContext,
+    ];
+    for (final ctx in contexts) {
+      if (ctx == null) continue;
+      final box = ctx.findRenderObject() as RenderBox;
+      _sectionOffsets.add(offset);
+      offset += box.size.height;
+    }
+  }
+
+  void _snapScroll() {
+    if (_sectionOffsets.isEmpty) return;
+    final current = _scrollController.offset;
+    double target = _sectionOffsets.first;
+    double diff = (current - target).abs();
+    for (final o in _sectionOffsets) {
+      final d = (current - o).abs();
+      if (d < diff) {
+        diff = d;
+        target = o;
+      }
+    }
+    _scrollController.animateTo(
+      target,
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeOut,
+    );
   }
 
   @override
@@ -55,45 +99,55 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           ),
         ],
       ),
-      body: CustomScrollView(
-        slivers: [
-
-          const SliverToBoxAdapter(
-            child: MuscleRecoverySection(),
-          ),
-          SliverToBoxAdapter(
-            child: CalendarSection(
-              calendarFormat: _calendarFormat,
-              focusedDay: _focusedDay,
-              selectedDay: _selectedDay,
-              onFormatChanged: (format) {
-                setState(() => _calendarFormat = format);
-              },
-              onDaySelected: (selectedDay, focusedDay) {
-                if (!isSameDay(_selectedDay, selectedDay)) {
-                  setState(() {
-                    _selectedDay = selectedDay;
-                    _focusedDay = focusedDay;
-                  });
-                }
-              },
-              onPageChanged: (focusedDay) {
-                _focusedDay = focusedDay;
-              },
+      body: NotificationListener<ScrollEndNotification>(
+        onNotification: (notification) {
+          _updateOffsets();
+          _snapScroll();
+          return false;
+        },
+        child: CustomScrollView(
+          controller: _scrollController,
+          slivers: [
+            SliverToBoxAdapter(
+              key: _recoveryKey,
+              child: const MuscleRecoverySection(),
             ),
-          ),
-          const SliverToBoxAdapter(
-            child: ScrollHintSection(),
-          ),
-          SliverToBoxAdapter(
-
-            child: WorkoutLogSection(
-              selectedDay: _selectedDay,
-              onAddWorkout: _showAddWorkoutDialog,
-              onDeleteWorkout: _deleteWorkout,
+            SliverToBoxAdapter(
+              key: _calendarKey,
+              child: CalendarSection(
+                calendarFormat: _calendarFormat,
+                focusedDay: _focusedDay,
+                selectedDay: _selectedDay,
+                onFormatChanged: (format) {
+                  setState(() => _calendarFormat = format);
+                },
+                onDaySelected: (selectedDay, focusedDay) {
+                  if (!isSameDay(_selectedDay, selectedDay)) {
+                    setState(() {
+                      _selectedDay = selectedDay;
+                      _focusedDay = focusedDay;
+                    });
+                  }
+                },
+                onPageChanged: (focusedDay) {
+                  _focusedDay = focusedDay;
+                },
+              ),
             ),
-          ),
-        ],
+            const SliverToBoxAdapter(
+              key: _hintKey,
+              child: ScrollHintSection(),
+            ),
+            SliverToBoxAdapter(
+              key: _logKey,
+              child: WorkoutLogSection(
+                selectedDay: _selectedDay,
+                onAddWorkout: _showAddWorkoutDialog,
+                onDeleteWorkout: _deleteWorkout,
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showAddWorkoutDialog,
@@ -109,6 +163,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     final detailsController = TextEditingController();
     MuscleGroup selectedMuscle = MuscleGroup.chest;
     int selectedIntensity = 5;
+    final presetsProvider = Provider.of<ExercisePresets>(context, listen: false);
 
     showDialog(
       context: context,
@@ -121,11 +176,43 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
-                      controller: exerciseController,
-                      decoration: const InputDecoration(
-                        labelText: '운동명',
-                        border: OutlineInputBorder(),
+                    Autocomplete<String>(
+                      optionsBuilder: (TextEditingValue textEditingValue) {
+                        if (textEditingValue.text == '') {
+                          return const Iterable<String>.empty();
+                        }
+                        return presetsProvider.presets.where((String option) {
+                          return option
+                              .toLowerCase()
+                              .contains(textEditingValue.text.toLowerCase());
+                        });
+                      },
+                      fieldViewBuilder: (context, textEditingController,
+                          focusNode, onFieldSubmitted) {
+                        exerciseController.text = textEditingController.text;
+                        return TextField(
+                          controller: textEditingController,
+                          focusNode: focusNode,
+                          decoration: const InputDecoration(
+                            labelText: '운동명',
+                            border: OutlineInputBorder(),
+                          ),
+                        );
+                      },
+                      onSelected: (selection) {
+                        exerciseController.text = selection;
+                      },
+                    ),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: () {
+                          if (exerciseController.text.isNotEmpty) {
+                            presetsProvider.addPreset(exerciseController.text);
+                          }
+                        },
+                        icon: const Icon(Icons.save),
+                        label: const Text('프리셋에 저장'),
                       ),
                     ),
                     const SizedBox(height: 16),
