@@ -90,7 +90,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           ),
         ],
       ),
-      floatingActionButton: _currentPage == 1
+      floatingActionButton: _currentPage == 2
           ? FloatingActionButton(
               onPressed: _openAddWorkoutPage,
               backgroundColor: Theme.of(context).colorScheme.primary,
