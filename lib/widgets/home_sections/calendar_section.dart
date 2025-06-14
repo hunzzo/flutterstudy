@@ -36,12 +36,7 @@ class CalendarSection extends StatelessWidget {
       color: isDark
           ? Colors.grey[850]
           : Theme.of(context).colorScheme.primary.withAlpha(26),
-      padding: const EdgeInsets.all(16),
-      child: Card(
-        elevation: 4,
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: TableCalendar<WorkoutRecord>(
+      child: TableCalendar<WorkoutRecord>(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: focusedDay,
@@ -85,8 +80,6 @@ class CalendarSection extends StatelessWidget {
             onFormatChanged: onFormatChanged,
             onPageChanged: onPageChanged,
           ),
-        ),
-      ),
     );
   }
 }
