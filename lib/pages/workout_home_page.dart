@@ -28,6 +28,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   final GlobalKey _hintKey = GlobalKey();
   final GlobalKey _logKey = GlobalKey();
   List<double> _sectionOffsets = [];
+  bool _isSnapping = false;
 
   @override
   void initState() {
@@ -54,7 +55,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   }
 
   void _snapScroll() {
-    if (_sectionOffsets.isEmpty) return;
+    if (_sectionOffsets.isEmpty || _isSnapping) return;
     final current = _scrollController.offset;
     double target = _sectionOffsets.first;
     double diff = (current - target).abs();
@@ -65,11 +66,15 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
         target = o;
       }
     }
-    _scrollController.animateTo(
-      target,
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeOut,
-    );
+    if (diff < 1.0) return;
+    _isSnapping = true;
+    _scrollController
+        .animateTo(
+          target,
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOut,
+        )
+        .then((_) => _isSnapping = false);
   }
 
   @override
@@ -322,5 +327,11 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
 
     final provider = Provider.of<WorkoutData>(context, listen: false);
     provider.deleteWorkout(selectedDate, index);
+  }
+
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
   }
 }
