@@ -142,19 +142,25 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                     ],
                   ),
                 ),
-                Wrap(
-                  spacing: 4,
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     for (int i = 0; i < workout.setDetails.length; i++)
-                      ChoiceChip(
-                        label: Text(
-                            '${workout.setDetails[i].weight}kg x ${workout.setDetails[i].reps}'),
-                        selected: workout.setDetails[i].done,
-                        onSelected: (_) {
-                          Provider.of<WorkoutData>(context, listen: false)
-                              .toggleSetDone(widget.selectedDay ?? DateTime.now(), index, i);
-                          _startRestTimer(context);
-                        },
+                      Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: ChoiceChip(
+                          label: Text(
+                              '${workout.setDetails[i].weight}kg x ${workout.setDetails[i].reps}'),
+                          selected: workout.setDetails[i].done,
+                          onSelected: (_) {
+                            Provider.of<WorkoutData>(context, listen: false)
+                                .toggleSetDone(
+                                    widget.selectedDay ?? DateTime.now(),
+                                    index,
+                                    i);
+                            _startRestTimer(context);
+                          },
+                        ),
                       ),
                   ],
                 ),
