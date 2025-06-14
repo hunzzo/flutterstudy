@@ -21,7 +21,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final PageController _pageController = PageController(initialPage: 1);
+  final PageController _pageController =
+      PageController(initialPage: 1, viewportFraction: 0.9);
   int _currentPage = 1;
 
   @override

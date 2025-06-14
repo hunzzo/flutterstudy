@@ -36,7 +36,10 @@ class CalendarSection extends StatelessWidget {
       color: isDark
           ? Colors.grey[850]
           : Theme.of(context).colorScheme.primary.withAlpha(26),
-      child: TableCalendar<WorkoutRecord>(
+      child: Column(
+        children: [
+          Expanded(
+            child: TableCalendar<WorkoutRecord>(
             firstDay: DateTime.utc(2020, 1, 1),
             lastDay: DateTime.utc(2030, 12, 31),
             focusedDay: focusedDay,
@@ -81,6 +84,26 @@ class CalendarSection extends StatelessWidget {
             onFormatChanged: onFormatChanged,
             onPageChanged: onPageChanged,
           ),
+          ),
+          Container(
+            padding: const EdgeInsets.all(16),
+            alignment: Alignment.centerLeft,
+            child: Row(
+              children: [
+                Icon(Icons.fitness_center,
+                    color: Theme.of(context).colorScheme.primary),
+                const SizedBox(width: 8),
+                Text(
+                  selectedDay != null
+                      ? '${selectedDay!.month}월 ${selectedDay!.day}일 운동 기록'
+                      : '오늘의 운동 기록',
+                  style: Theme.of(context).textTheme.titleMedium,
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
     );
   }
 }
