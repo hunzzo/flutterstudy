@@ -7,7 +7,7 @@ import '../models/workout.dart';
 
 class AddWorkoutPage extends StatefulWidget {
   final DateTime selectedDate;
-  const AddWorkoutPage({Key? key, required this.selectedDate}) : super(key: key);
+  const AddWorkoutPage({super.key, required this.selectedDate});
 
   @override
   State<AddWorkoutPage> createState() => _AddWorkoutPageState();

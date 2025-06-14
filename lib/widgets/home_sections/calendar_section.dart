@@ -47,8 +47,9 @@ class CalendarSection extends StatelessWidget {
               outsideDaysVisible: false,
               defaultTextStyle: TextStyle(color: textColor),
               weekendTextStyle: TextStyle(color: textColor),
-              outsideTextStyle:
-                  TextStyle(color: textColor?.withOpacity(0.5)),
+              outsideTextStyle: TextStyle(
+                color: textColor?.withAlpha((0.5 * 255).round()),
+              ),
               markerDecoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.secondary,
                 shape: BoxShape.circle,

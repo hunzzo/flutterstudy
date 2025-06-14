@@ -72,7 +72,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
               ),
               const SizedBox(height: 8),
               ElevatedButton(
-                onPressed: onAddWorkout,
+                onPressed: widget.onAddWorkout,
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
                       Theme.of(context).colorScheme.primary,
@@ -137,7 +137,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                       ),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red[400]),
-                        onPressed: () => onDeleteWorkout(index),
+                        onPressed: () => widget.onDeleteWorkout(index),
                       ),
                     ],
                   ),
@@ -207,6 +207,8 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
       ),
     );
 
+    if (!context.mounted) return;
+
     if (result == true) {
       final weight = double.tryParse(weightController.text) ?? 0;
       final reps = int.tryParse(repsController.text) ?? 0;
@@ -222,6 +224,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
       const SnackBar(content: Text('휴식 시작!'), duration: Duration(seconds: 1)),
     );
     Future.delayed(const Duration(seconds: 60), () {
+      if (!context.mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('휴식 종료'), duration: Duration(seconds: 1)),
       );
