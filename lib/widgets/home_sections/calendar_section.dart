@@ -85,23 +85,7 @@ class CalendarSection extends StatelessWidget {
             onPageChanged: onPageChanged,
           ),
           ),
-          Container(
-            padding: const EdgeInsets.all(16),
-            alignment: Alignment.centerLeft,
-            child: Row(
-              children: [
-                Icon(Icons.fitness_center,
-                    color: Theme.of(context).colorScheme.primary),
-                const SizedBox(width: 8),
-                Text(
-                  selectedDay != null
-                      ? '${selectedDay!.month}월 ${selectedDay!.day}일 운동 기록'
-                      : '오늘의 운동 기록',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-              ],
-            ),
-          )
+         
         ],
       ),
     );

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:table_calendar/table_calendar.dart';
 
-import '../models/workout.dart';
+//import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
 import '../widgets/home_sections/muscle_recovery_section.dart';
@@ -22,7 +22,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   final PageController _pageController =
-      PageController(initialPage: 1, viewportFraction: 0.9);
+      PageController(initialPage: 1, viewportFraction: .9);
   int _currentPage = 1;
 
   @override
@@ -134,7 +134,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       builder: (_) {
         return DraggableScrollableSheet(
           initialChildSize: 0.4,
-          maxChildSize: 0.9,
+          maxChildSize: 1,
           builder: (context, controller) {
             return Material(
               borderRadius:
