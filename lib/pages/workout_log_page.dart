@@ -36,6 +36,17 @@ class WorkoutLogBody extends StatefulWidget {
 // WorkoutLogBody의 상태 클래스
 class _WorkoutLogBodyState extends State<WorkoutLogBody> {
   @override
+  void didUpdateWidget(covariant WorkoutLogBody oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!isSameDay(oldWidget.selectedDay, widget.selectedDay)) {
+      final controller = widget.controller;
+      if (controller != null && controller.hasClients) {
+        controller.jumpTo(controller.position.minScrollExtent);
+      }
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ListView(
       controller: widget.controller,
