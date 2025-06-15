@@ -4,9 +4,17 @@ import 'package:provider/provider.dart';
 import '../../models/workout.dart';
 import '../../providers/workout_data.dart';
 import '../body_painter.dart';
+import 'favorite_progress_section.dart';
 
-class MuscleRecoverySection extends StatelessWidget {
+class MuscleRecoverySection extends StatefulWidget {
   const MuscleRecoverySection({super.key});
+
+  @override
+  State<MuscleRecoverySection> createState() => _MuscleRecoverySectionState();
+}
+
+class _MuscleRecoverySectionState extends State<MuscleRecoverySection> {
+  final PageController _controller = PageController();
 
   List<WorkoutRecord> _getWorkoutsForDay(BuildContext context, DateTime day) {
     final provider = Provider.of<WorkoutData>(context, listen: false);
@@ -46,12 +54,20 @@ class MuscleRecoverySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return PageView(
+      controller: _controller,
+      children: [
+        _buildRecoveryContent(context),
+        const FavoriteProgressSection(),
+      ],
+    );
+  }
 
+  Widget _buildRecoveryContent(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final recoveryStatus = _getMuscleRecoveryStatus(context);
     return Container(
       color: isDark ? Colors.grey[900] : Colors.grey[100],
-
       padding: const EdgeInsets.all(16),
       child: Column(
         children: [
@@ -62,15 +78,12 @@ class MuscleRecoverySection extends StatelessWidget {
               const SizedBox(width: 8),
               Text(
                 '근육 회복 상태',
-
                 style: Theme.of(context).textTheme.titleLarge,
               ),
             ],
           ),
           const SizedBox(height: 16),
-
           _buildMuscleRecoveryView(context, recoveryStatus, isDark),
-
         ],
       ),
     );

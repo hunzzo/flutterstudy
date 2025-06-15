@@ -142,4 +142,7 @@ class WorkoutData extends ChangeNotifier {
     });
     return count;
   }
+
+  Map<DateTime, List<WorkoutRecord>> get allWorkoutData =>
+      Map.unmodifiable(_workoutData);
 }
