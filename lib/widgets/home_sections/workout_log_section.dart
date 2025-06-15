@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'dart:async';
 
 import '../../providers/workout_data.dart';
 import '../../models/workout.dart';
@@ -154,55 +155,75 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                     for (int i = 0; i < workout.setDetails.length; i++)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
-                        child: SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: workout.setDetails[i].done
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.surfaceVariant,
-                              foregroundColor: workout.setDetails[i].done
-                                  ? Colors.white
-                                  : Theme.of(context).colorScheme.onSurface,
-                            ),
-                            onPressed: () {
-                              Provider.of<WorkoutData>(context, listen: false)
-                                  .toggleSetDone(
-                                      widget.selectedDay ?? DateTime.now(),
-                                      index,
-                                      i);
-                              _startRestTimer(context);
-                            },
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              mainAxisSize: MainAxisSize.max,
-                              children: [
-                                EditableNumber(
-                                  value: workout.setDetails[i].weight,
-                                  onChanged: (v) {
-                                    Provider.of<WorkoutData>(context,
-                                            listen: false)
-                                        .updateSet(
-                                            widget.selectedDay ??
-                                                DateTime.now(),
-                                            index,
-                                            i,
-                                            weight: v.toDouble());
-                                  },
-                                ),
-                                const Text('kg x '),
-                                EditableNumber(
-                                  value: workout.setDetails[i].reps,
-                                  integer: true,
-                                  onChanged: (v) {
-                                    Provider.of<WorkoutData>(context,
-                                            listen: false)
-                                        .updateSet(widget.selectedDay ??
-                                            DateTime.now(), index, i,
-                                            reps: v.toInt());
-                                  },
-                                ),
-                              ],
+                        child: Dismissible(
+                          key: ValueKey('set_${index}_$i'),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            color: Colors.red,
+                            child:
+                                const Icon(Icons.delete, color: Colors.white),
+                          ),
+                          onDismissed: (_) {
+                            Provider.of<WorkoutData>(context, listen: false)
+                                .deleteSet(widget.selectedDay ?? DateTime.now(),
+                                    index, i);
+                          },
+                          child: SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: workout.setDetails[i].done
+                                    ? Theme.of(context).colorScheme.primary
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .surfaceVariant,
+                                foregroundColor: workout.setDetails[i].done
+                                    ? Colors.white
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface,
+                              ),
+                              onPressed: () {
+                                Provider.of<WorkoutData>(context, listen: false)
+                                    .toggleSetDone(
+                                        widget.selectedDay ?? DateTime.now(),
+                                        index,
+                                        i);
+                                _startRestTimer(context);
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                mainAxisSize: MainAxisSize.max,
+                                children: [
+                                  EditableNumber(
+                                    value: workout.setDetails[i].weight,
+                                    onChanged: (v) {
+                                      Provider.of<WorkoutData>(context,
+                                              listen: false)
+                                          .updateSet(
+                                              widget.selectedDay ??
+                                                  DateTime.now(),
+                                              index,
+                                              i,
+                                              weight: v.toDouble());
+                                    },
+                                  ),
+                                  const Text('kg x '),
+                                  EditableNumber(
+                                    value: workout.setDetails[i].reps,
+                                    integer: true,
+                                    onChanged: (v) {
+                                      Provider.of<WorkoutData>(context,
+                                              listen: false)
+                                          .updateSet(widget.selectedDay ??
+                                              DateTime.now(), index, i,
+                                              reps: v.toInt());
+                                    },
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
@@ -225,14 +246,60 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
 
 
   void _startRestTimer(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('휴식 시작!'), duration: Duration(seconds: 1)),
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (_) => const RestTimerDialog(duration: Duration(seconds: 60)),
     );
-    Future.delayed(const Duration(seconds: 60), () {
-      if (!context.mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('휴식 종료'), duration: Duration(seconds: 1)),
-      );
+  }
+}
+
+class RestTimerDialog extends StatefulWidget {
+  final Duration duration;
+  const RestTimerDialog({super.key, required this.duration});
+
+  @override
+  State<RestTimerDialog> createState() => _RestTimerDialogState();
+}
+
+class _RestTimerDialogState extends State<RestTimerDialog> {
+  late int _secondsLeft;
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _secondsLeft = widget.duration.inSeconds;
+    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (_secondsLeft <= 1) {
+        timer.cancel();
+        if (mounted) Navigator.of(context).pop();
+      } else {
+        setState(() => _secondsLeft--);
+      }
     });
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final progress =
+        1 - _secondsLeft / widget.duration.inSeconds.toDouble();
+    return AlertDialog(
+      title: const Text('휴식 중'),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text('$_secondsLeft초 남음'),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(value: progress),
+        ],
+      ),
+    );
   }
 }

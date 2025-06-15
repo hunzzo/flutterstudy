@@ -102,6 +102,16 @@ class WorkoutData extends ChangeNotifier {
     }
   }
 
+  void deleteSet(DateTime day, int workoutIndex, int setIndex) {
+    final key = DateTime(day.year, day.month, day.day);
+    final workout = _workoutData[key]?[workoutIndex];
+    if (workout != null && setIndex < workout.setDetails.length) {
+      workout.setDetails.removeAt(setIndex);
+      notifyListeners();
+      _saveData();
+    }
+  }
+
   void toggleSetDone(DateTime day, int workoutIndex, int setIndex) {
     final key = DateTime(day.year, day.month, day.day);
     final workout = _workoutData[key]?[workoutIndex];
