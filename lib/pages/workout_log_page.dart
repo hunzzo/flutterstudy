@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:table_calendar/table_calendar.dart';
 import 'dart:async';
 
 // 운동 데이터 제공자
@@ -130,6 +131,14 @@ class WorkoutLogSection extends StatefulWidget {
 }
 
 class _WorkoutLogSectionState extends State<WorkoutLogSection> {
+  @override
+  void didUpdateWidget(covariant WorkoutLogSection oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (!isSameDay(oldWidget.selectedDay, widget.selectedDay)) {
+      setState(() {});
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
