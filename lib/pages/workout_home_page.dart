@@ -4,6 +4,7 @@ import 'package:table_calendar/table_calendar.dart';
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
+import '../widgets/home_sections/workout_log_preview.dart';
 import '../widgets/home_sections/muscle_recovery_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
@@ -21,8 +22,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final PageController _pageController =
-      PageController(initialPage: 1, viewportFraction: .9);
+  final PageController _pageController = PageController(initialPage: 1);
   int _currentPage = 1;
 
   @override
@@ -64,25 +64,36 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
         onPageChanged: (index) => setState(() => _currentPage = index),
         children: [
           const MuscleRecoverySection(),
-          CalendarSection(
-            calendarFormat: _calendarFormat,
-            focusedDay: _focusedDay,
-            selectedDay: _selectedDay,
-            onFormatChanged: (format) {
-              setState(() => _calendarFormat = format);
-            },
-            onDaySelected: (selectedDay, focusedDay) {
-              if (!isSameDay(_selectedDay, selectedDay)) {
-                setState(() {
-                  _selectedDay = selectedDay;
-                  _focusedDay = focusedDay;
-                });
-              }
-              _showWorkoutPreview(selectedDay);
-            },
-            onPageChanged: (focusedDay) {
-              _focusedDay = focusedDay;
-            },
+          Column(
+            children: [
+              Expanded(
+                child: CalendarSection(
+                  calendarFormat: _calendarFormat,
+                  focusedDay: _focusedDay,
+                  selectedDay: _selectedDay,
+                  onFormatChanged: (format) {
+                    setState(() => _calendarFormat = format);
+                  },
+                  onDaySelected: (selectedDay, focusedDay) {
+                    if (!isSameDay(_selectedDay, selectedDay)) {
+                      setState(() {
+                        _selectedDay = selectedDay;
+                        _focusedDay = focusedDay;
+                      });
+                    }
+                    _showWorkoutPreview(selectedDay);
+                  },
+                  onPageChanged: (focusedDay) {
+                    _focusedDay = focusedDay;
+                  },
+                ),
+              ),
+              WorkoutLogPreview(
+                selectedDay: _selectedDay,
+                onAddWorkout: _openAddWorkoutPage,
+                onDeleteWorkout: _deleteWorkout,
+              ),
+            ],
           ),
           WorkoutLogSection(
             selectedDay: _selectedDay,

@@ -46,6 +46,7 @@ class CalendarSection extends StatelessWidget {
             calendarFormat: calendarFormat,
             eventLoader: (day) => _getWorkoutsForDay(context, day),
             startingDayOfWeek: StartingDayOfWeek.monday,
+            availableGestures: AvailableGestures.horizontalSwipe,
             calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
               defaultTextStyle: TextStyle(color: textColor),
@@ -71,6 +72,8 @@ class CalendarSection extends StatelessWidget {
               formatButtonVisible: true,
               titleCentered: true,
               formatButtonShowsNext: false,
+              leftChevronVisible: false,
+              rightChevronVisible: false,
               titleTextStyle:
                   Theme.of(context).textTheme.titleMedium ?? const TextStyle(),
               formatButtonDecoration: BoxDecoration(
