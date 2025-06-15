@@ -15,6 +15,7 @@ class WorkoutLogBody extends StatefulWidget {
   final VoidCallback onAddWorkout;
   final void Function(int) onDeleteWorkout;
   final bool showOnlyHeader;
+  final DraggableScrollableController? sheetController;
 
   const WorkoutLogBody({
     super.key,
@@ -23,6 +24,7 @@ class WorkoutLogBody extends StatefulWidget {
     required this.onAddWorkout,
     required this.onDeleteWorkout,
     this.showOnlyHeader = false,
+    this.sheetController,
   });
 
   @override
@@ -41,6 +43,7 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
           onAddWorkout: widget.onAddWorkout,
           onDeleteWorkout: widget.onDeleteWorkout,
           showOnlyHeader: widget.showOnlyHeader,
+          sheetController: widget.sheetController,
         ),
         if (!widget.showOnlyHeader) const SizedBox(height: 80),
       ],
@@ -93,6 +96,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
         selectedDay: widget.selectedDay,
         onAddWorkout: _openAddWorkoutPage,
         onDeleteWorkout: _deleteWorkout,
+        sheetController: null,
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: _openAddWorkoutPage,
