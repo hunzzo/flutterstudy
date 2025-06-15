@@ -8,6 +8,7 @@ import '../widgets/home_sections/muscle_recovery_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
 import 'add_workout_page.dart';
+import 'workout_log_page.dart';
 import 'package:provider/provider.dart';
 
 class WorkoutHomePage extends StatefulWidget {
@@ -22,17 +23,14 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
   late PageController _pageController;
-  double _viewportFraction = 1.0;
   int _currentPage = 1;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
-    _viewportFraction = _currentPage == 1 ? 0.8 : 1.0;
     _pageController = PageController(
       initialPage: _currentPage,
-      viewportFraction: _viewportFraction,
     );
   }
 
@@ -66,11 +64,28 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       body: PageView(
         controller: _pageController,
         scrollDirection: Axis.vertical,
-        onPageChanged: (index) {
+        onPageChanged: (index) async {
           setState(() {
             _currentPage = index;
-            _updatePageController();
           });
+          if (index == 2) {
+            await Navigator.of(context).push(
+              PageRouteBuilder(
+                pageBuilder: (_, __, ___) =>
+                    WorkoutLogPage(selectedDay: _selectedDay),
+                transitionsBuilder: (_, animation, __, child) {
+                  return SlideTransition(
+                    position: Tween<Offset>(
+                      begin: const Offset(0, 1),
+                      end: Offset.zero,
+                    ).animate(animation),
+                    child: child,
+                  );
+                },
+              ),
+            );
+            _pageController.jumpToPage(1);
+          }
         },
         children: [
           const MuscleRecoverySection(),
@@ -119,20 +134,9 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               ),
             ],
           ),
-          WorkoutLogSection(
-            selectedDay: _selectedDay,
-            onAddWorkout: _openAddWorkoutPage,
-            onDeleteWorkout: _deleteWorkout,
-          ),
+          Container(),
         ],
       ),
-      floatingActionButton: _currentPage == 2
-          ? FloatingActionButton(
-              onPressed: _openAddWorkoutPage,
-              backgroundColor: Theme.of(context).colorScheme.primary,
-              child: const Icon(Icons.add),
-            )
-          : null,
     );
   }
 
@@ -148,19 +152,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       ),
     );
   }
-
-  void _updatePageController() {
-    final fraction = _currentPage == 1 ? 0.8 : 1.0;
-    if (_viewportFraction == fraction) return;
-    _viewportFraction = fraction;
-    final oldController = _pageController;
-    _pageController = PageController(
-      initialPage: _currentPage,
-      viewportFraction: _viewportFraction,
-    );
-    oldController.dispose();
-  }
-
 
   void _deleteWorkout(int index) {
     final selectedDate = DateTime(
