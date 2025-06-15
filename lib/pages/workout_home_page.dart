@@ -4,7 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/workout_log_section.dart';
-import '../widgets/home_sections/workout_log_preview.dart';
 import '../widgets/home_sections/muscle_recovery_section.dart';
 import 'settings_page.dart';
 import '../providers/workout_data.dart';
@@ -67,31 +66,45 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           Column(
             children: [
               Expanded(
-                child: CalendarSection(
-                  calendarFormat: _calendarFormat,
-                  focusedDay: _focusedDay,
-                  selectedDay: _selectedDay,
-                  onFormatChanged: (format) {
-                    setState(() => _calendarFormat = format);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    if (!isSameDay(_selectedDay, selectedDay)) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
-                    }
-                    _showWorkoutPreview(selectedDay);
-                  },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
+                child: GestureDetector(
+                  behavior: HitTestBehavior.translucent,
+                  onHorizontalDragEnd: _handleCalendarHorizontalDrag,
+                  child: CalendarSection(
+                    calendarFormat: _calendarFormat,
+                    focusedDay: _focusedDay,
+                    selectedDay: _selectedDay,
+                    onFormatChanged: (format) {
+                      setState(() => _calendarFormat = format);
+                    },
+                    onDaySelected: (selectedDay, focusedDay) {
+                      if (!isSameDay(_selectedDay, selectedDay)) {
+                        setState(() {
+                          _selectedDay = selectedDay;
+                          _focusedDay = focusedDay;
+                        });
+                      }
+                      _pageController.animateToPage(
+                        2,
+                        duration: const Duration(milliseconds: 300),
+                        curve: Curves.easeInOut,
+                      );
+                    },
+                    onPageChanged: (focusedDay) {
+                      _focusedDay = focusedDay;
+                    },
+                  ),
                 ),
               ),
-              WorkoutLogPreview(
-                selectedDay: _selectedDay,
-                onAddWorkout: _openAddWorkoutPage,
-                onDeleteWorkout: _deleteWorkout,
+              ClipRect(
+                child: Align(
+                  alignment: Alignment.topCenter,
+                  heightFactor: 0.25,
+                  child: WorkoutLogSection(
+                    selectedDay: _selectedDay,
+                    onAddWorkout: _openAddWorkoutPage,
+                    onDeleteWorkout: _deleteWorkout,
+                  ),
+                ),
               ),
             ],
           ),
@@ -137,33 +150,19 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     provider.deleteWorkout(selectedDate, index);
   }
 
-  void _showWorkoutPreview(DateTime day) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.4,
-          maxChildSize: 1,
-          builder: (context, controller) {
-            return Material(
-              borderRadius:
-                  const BorderRadius.vertical(top: Radius.circular(16)),
-              child: SingleChildScrollView(
-                controller: controller,
-                child: WorkoutLogSection(
-                  selectedDay: day,
-                  onAddWorkout: _openAddWorkoutPage,
-                  onDeleteWorkout: _deleteWorkout,
-                ),
-              ),
-            );
-          },
-        );
-      },
-    );
+  void _handleCalendarHorizontalDrag(DragEndDetails details) {
+    if (details.primaryVelocity == null) return;
+    if (details.primaryVelocity! < 0) {
+      setState(() {
+        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month + 1, 1);
+      });
+    } else if (details.primaryVelocity! > 0) {
+      setState(() {
+        _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
+      });
+    }
   }
+
 
   @override
   void dispose() {
