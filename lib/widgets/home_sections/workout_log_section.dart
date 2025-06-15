@@ -10,12 +10,14 @@ class WorkoutLogSection extends StatefulWidget {
   final DateTime? selectedDay;
   final VoidCallback onAddWorkout;
   final void Function(int) onDeleteWorkout;
+  final bool showOnlyHeader;
 
   const WorkoutLogSection({
     super.key,
     required this.selectedDay,
     required this.onAddWorkout,
     required this.onDeleteWorkout,
+    this.showOnlyHeader = false,
   });
 
   @override
@@ -45,8 +47,10 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
-          _buildWorkoutList(context),
+          if (!widget.showOnlyHeader) ...[
+            const SizedBox(height: 16),
+            _buildWorkoutList(context),
+          ],
         ],
       ),
     );
@@ -172,61 +176,60 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                           },
                           child: SizedBox(
                             width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: workout.setDetails[i].done
-                                    ? Theme.of(context).colorScheme.primary
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .surfaceVariant,
-                                foregroundColor: workout.setDetails[i].done
-                                    ? Colors.white
-                                    : Theme.of(context)
-                                        .colorScheme
-                                        .onSurface,
-                              ),
-                              onPressed: () {
-                                Provider.of<WorkoutData>(context, listen: false)
-                                    .toggleSetDone(
-                                        widget.selectedDay ?? DateTime.now(),
-                                        index,
-                                        i);
-                                _startRestTimer(context);
-                              },
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  EditableNumber(
-                                    value: workout.setDetails[i].weight,
-                                    onChanged: (v) {
-                                      Provider.of<WorkoutData>(context,
-                                              listen: false)
-                                          .updateSet(
-                                              widget.selectedDay ??
-                                                  DateTime.now(),
-                                              index,
-                                              i,
-                                              weight: v.toDouble());
-                                    },
+                            child: Material(
+                              color: workout.setDetails[i].done
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.surfaceVariant,
+                              child: InkWell(
+                                onTap: () {
+                                  Provider.of<WorkoutData>(context, listen: false)
+                                      .toggleSetDone(
+                                          widget.selectedDay ?? DateTime.now(),
+                                          index,
+                                          i);
+                                  _startRestTimer(context);
+                                },
+                                child: Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    mainAxisSize: MainAxisSize.max,
+                                    children: [
+                                      EditableNumber(
+                                        value: workout.setDetails[i].weight,
+                                        onChanged: (v) {
+                                          Provider.of<WorkoutData>(context,
+                                                  listen: false)
+                                              .updateSet(
+                                                  widget.selectedDay ??
+                                                      DateTime.now(),
+                                                  index,
+                                                  i,
+                                                  weight: v.toDouble());
+                                        },
+                                      ),
+                                      const Text('kg x '),
+                                      EditableNumber(
+                                        value: workout.setDetails[i].reps,
+                                        integer: true,
+                                        onChanged: (v) {
+                                          Provider.of<WorkoutData>(context,
+                                                  listen: false)
+                                              .updateSet(
+                                                  widget.selectedDay ??
+                                                      DateTime.now(),
+                                                  index,
+                                                  i,
+                                                  reps: v.toInt());
+                                        },
+                                      ),
+                                    ],
                                   ),
-                                  const Text('kg x '),
-                                  EditableNumber(
-                                    value: workout.setDetails[i].reps,
-                                    integer: true,
-                                    onChanged: (v) {
-                                      Provider.of<WorkoutData>(context,
-                                              listen: false)
-                                          .updateSet(widget.selectedDay ??
-                                              DateTime.now(), index, i,
-                                              reps: v.toInt());
-                                    },
-                                  ),
-                                ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
                       ),
                   ],
                 ),
@@ -245,24 +248,39 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
   }
 
 
+  OverlayEntry? _restEntry;
+
   void _startRestTimer(BuildContext context) {
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => const RestTimerDialog(duration: Duration(seconds: 60)),
+    _restEntry?.remove();
+    _restEntry = OverlayEntry(
+      builder: (_) => Positioned(
+        bottom: 0,
+        left: 0,
+        right: 0,
+        child: RestTimerBar(
+          duration: const Duration(seconds: 60),
+          onFinished: () {
+            _restEntry?.remove();
+            _restEntry = null;
+          },
+        ),
+      ),
     );
+    Overlay.of(context).insert(_restEntry!);
   }
 }
 
-class RestTimerDialog extends StatefulWidget {
+class RestTimerBar extends StatefulWidget {
   final Duration duration;
-  const RestTimerDialog({super.key, required this.duration});
+  final VoidCallback onFinished;
+
+  const RestTimerBar({super.key, required this.duration, required this.onFinished});
 
   @override
-  State<RestTimerDialog> createState() => _RestTimerDialogState();
+  State<RestTimerBar> createState() => _RestTimerBarState();
 }
 
-class _RestTimerDialogState extends State<RestTimerDialog> {
+class _RestTimerBarState extends State<RestTimerBar> {
   late int _secondsLeft;
   late Timer _timer;
 
@@ -273,7 +291,7 @@ class _RestTimerDialogState extends State<RestTimerDialog> {
     _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
       if (_secondsLeft <= 1) {
         timer.cancel();
-        if (mounted) Navigator.of(context).pop();
+        widget.onFinished();
       } else {
         setState(() => _secondsLeft--);
       }
@@ -290,15 +308,33 @@ class _RestTimerDialogState extends State<RestTimerDialog> {
   Widget build(BuildContext context) {
     final progress =
         1 - _secondsLeft / widget.duration.inSeconds.toDouble();
-    return AlertDialog(
-      title: const Text('휴식 중'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Text('$_secondsLeft초 남음'),
-          const SizedBox(height: 16),
-          LinearProgressIndicator(value: progress),
-        ],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: Material(
+          elevation: 4,
+          borderRadius: BorderRadius.circular(8),
+          color: Theme.of(context).colorScheme.primary,
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              children: [
+                Expanded(
+                  child: LinearProgressIndicator(
+                    value: progress,
+                    backgroundColor: Colors.white24,
+                    color: Colors.white,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Text(
+                  '$_secondsLeft초',
+                  style: const TextStyle(color: Colors.white),
+                ),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }
