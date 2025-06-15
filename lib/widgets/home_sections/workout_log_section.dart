@@ -331,29 +331,26 @@ class _RestTimerBarState extends State<RestTimerBar> {
   Widget build(BuildContext context) {
     final progress =
         1 - _secondsLeft / widget.duration.inSeconds.toDouble();
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 8),
-      child: Material(
-        elevation: 4,
-        color: Theme.of(context).colorScheme.primary,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          child: Row(
-              children: [
-                Expanded(
-                  child: LinearProgressIndicator(
-                    value: progress,
-                    backgroundColor: Colors.white24,
-                    color: Colors.white,
-                  ),
+    return Material(
+      elevation: 4,
+      color: Theme.of(context).colorScheme.primary,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
+        child: Row(
+            children: [
+              Expanded(
+                child: LinearProgressIndicator(
+                  value: progress,
+                  backgroundColor: Colors.white24,
+                  color: Colors.white,
                 ),
-                const SizedBox(width: 12),
-                Text(
-                  '$_secondsLeft초',
-                  style: const TextStyle(color: Colors.white),
-                ),
-              ],
-          ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                '$_secondsLeft초',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ],
         ),
       ),
     );
