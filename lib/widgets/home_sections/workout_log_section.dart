@@ -245,6 +245,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                             ),
                           ),
                       ),
+                      ),
                   ],
                 ),
               ],
