@@ -14,16 +14,20 @@ class EditableNumber extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onHorizontalDragUpdate: (details) {
-        final delta = details.primaryDelta ?? 0;
-        num newValue = value + delta / 2;
-        if (integer) newValue = newValue.round();
-        onChanged(newValue);
-      },
-      child: Text(
-        integer ? value.round().toString() : value.toStringAsFixed(1),
-        style: Theme.of(context).textTheme.bodyMedium,
+    return SizedBox(
+      width: integer ? 40 : 60,
+      child: TextFormField(
+        initialValue:
+            integer ? value.round().toString() : value.toStringAsFixed(1),
+        keyboardType: TextInputType.numberWithOptions(decimal: !integer),
+        textAlign: TextAlign.center,
+        decoration: const InputDecoration(isDense: true, border: InputBorder.none),
+        onChanged: (val) {
+          final parsed = num.tryParse(val);
+          if (parsed != null) {
+            onChanged(parsed);
+          }
+        },
       ),
     );
   }
