@@ -154,45 +154,57 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                     for (int i = 0; i < workout.setDetails.length; i++)
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
-                        child: ChoiceChip(
-                          label: Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              EditableNumber(
-                                value: workout.setDetails[i].weight,
-                                onChanged: (v) {
-                                  Provider.of<WorkoutData>(context, listen: false)
-                                      .updateSet(
-                                          widget.selectedDay ?? DateTime.now(),
-                                          index,
-                                          i,
-                                          weight: v.toDouble());
-                                },
-                              ),
-                              const Text('kg x '),
-                              EditableNumber(
-                                value: workout.setDetails[i].reps,
-                                integer: true,
-                                onChanged: (v) {
-                                  Provider.of<WorkoutData>(context, listen: false)
-                                      .updateSet(
-                                          widget.selectedDay ?? DateTime.now(),
-                                          index,
-                                          i,
-                                          reps: v.toInt());
-                                },
-                              ),
-                            ],
+                        child: SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: workout.setDetails[i].done
+                                  ? Theme.of(context).colorScheme.primary
+                                  : Theme.of(context).colorScheme.surfaceVariant,
+                              foregroundColor: workout.setDetails[i].done
+                                  ? Colors.white
+                                  : Theme.of(context).colorScheme.onSurface,
+                            ),
+                            onPressed: () {
+                              Provider.of<WorkoutData>(context, listen: false)
+                                  .toggleSetDone(
+                                      widget.selectedDay ?? DateTime.now(),
+                                      index,
+                                      i);
+                              _startRestTimer(context);
+                            },
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                EditableNumber(
+                                  value: workout.setDetails[i].weight,
+                                  onChanged: (v) {
+                                    Provider.of<WorkoutData>(context,
+                                            listen: false)
+                                        .updateSet(
+                                            widget.selectedDay ??
+                                                DateTime.now(),
+                                            index,
+                                            i,
+                                            weight: v.toDouble());
+                                  },
+                                ),
+                                const Text('kg x '),
+                                EditableNumber(
+                                  value: workout.setDetails[i].reps,
+                                  integer: true,
+                                  onChanged: (v) {
+                                    Provider.of<WorkoutData>(context,
+                                            listen: false)
+                                        .updateSet(widget.selectedDay ??
+                                            DateTime.now(), index, i,
+                                            reps: v.toInt());
+                                  },
+                                ),
+                              ],
+                            ),
                           ),
-                          selected: workout.setDetails[i].done,
-                          onSelected: (_) {
-                            Provider.of<WorkoutData>(context, listen: false)
-                                .toggleSetDone(
-                                    widget.selectedDay ?? DateTime.now(),
-                                    index,
-                                    i);
-                            _startRestTimer(context);
-                          },
                         ),
                       ),
                   ],
