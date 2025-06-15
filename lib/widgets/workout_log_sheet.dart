@@ -38,7 +38,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
         duration: const Duration(milliseconds: 300),
         curve: Curves.easeOut,
       );
-    } else if (_expanded && widget.controller.size <= 0.25) {
+    } else if (_expanded && widget.controller.size <= 0.15) {
       _expanded = false;
     }
   }
@@ -78,8 +78,8 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       controller: widget.controller,
-      minChildSize: 0.2,
-      initialChildSize: 0.25,
+      minChildSize: 0.1,
+      initialChildSize: 0.15,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return Container(
@@ -116,6 +116,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
                   onAddWorkout: _openAddWorkoutPage,
                   onDeleteWorkout: _deleteWorkout,
                   controller: scrollController,
+                  showOnlyHeader: !_expanded,
                 ),
               ),
             ],
