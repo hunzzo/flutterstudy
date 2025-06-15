@@ -21,13 +21,19 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
-  final PageController _pageController = PageController(initialPage: 1);
+  late PageController _pageController;
+  double _viewportFraction = 1.0;
   int _currentPage = 1;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
+    _viewportFraction = _currentPage == 1 ? 0.8 : 1.0;
+    _pageController = PageController(
+      initialPage: _currentPage,
+      viewportFraction: _viewportFraction,
+    );
   }
 
   @override
@@ -60,7 +66,12 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       body: PageView(
         controller: _pageController,
         scrollDirection: Axis.vertical,
-        onPageChanged: (index) => setState(() => _currentPage = index),
+        onPageChanged: (index) {
+          setState(() {
+            _currentPage = index;
+            _updatePageController();
+          });
+        },
         children: [
           const MuscleRecoverySection(),
           Column(
@@ -138,6 +149,18 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     );
   }
 
+  void _updatePageController() {
+    final fraction = _currentPage == 1 ? 0.8 : 1.0;
+    if (_viewportFraction == fraction) return;
+    _viewportFraction = fraction;
+    final oldController = _pageController;
+    _pageController = PageController(
+      initialPage: _currentPage,
+      viewportFraction: _viewportFraction,
+    );
+    oldController.dispose();
+  }
+
 
   void _deleteWorkout(int index) {
     final selectedDate = DateTime(
@@ -166,6 +189,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
 
   @override
   void dispose() {
+    _pageController.dispose();
     super.dispose();
   }
 }
