@@ -1,42 +1,39 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:flutterstudy/main.dart';
-import 'package:flutterstudy/pages/workout_home_page.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'package:flutterstudy/providers/workout_data.dart';
 import 'package:flutterstudy/models/workout.dart';
 
 void main() {
-  testWidgets('addWorkout adds a workout record', (WidgetTester tester) async {
-    await tester.pumpWidget(WorkoutApp());
+  TestWidgetsFlutterBinding.ensureInitialized();
 
-    final dynamic state = tester.state(find.byType(WorkoutHomePage));
-    state._addWorkout(
-      'Bench Test',
-      '3set',
-      '80kg x 10',
-      MuscleGroup.chest,
-      8,
-    );
-    await tester.pump();
-
-    expect(find.text('Bench Test'), findsOneWidget);
+  setUp(() {
+    SharedPreferences.setMockInitialValues({});
   });
 
-  testWidgets('deleteWorkout removes a workout record', (WidgetTester tester) async {
-    await tester.pumpWidget(WorkoutApp());
+  test('addWorkout stores a workout record', () async {
+    final data = WorkoutData();
+    final date = DateTime(2024, 1, 1);
+    final record =
+        WorkoutRecord('Bench Test', '3set', '80kg x 10', MuscleGroup.chest, 8);
 
-    final dynamic state = tester.state(find.byType(WorkoutHomePage));
-    state._addWorkout(
-      'Delete Test',
-      '3set',
-      '100kg x 5',
-      MuscleGroup.back,
-      7,
-    );
-    await tester.pump();
-    expect(find.text('Delete Test'), findsOneWidget);
+    data.addWorkout(date, record);
 
-    state._deleteWorkout(0);
-    await tester.pump();
+    final records = data.workoutsForDay(date);
+    expect(records.length, 1);
+    expect(records.first.exercise, 'Bench Test');
+  });
 
-    expect(find.text('Delete Test'), findsNothing);
+  test('deleteWorkout removes the workout record', () async {
+    final data = WorkoutData();
+    final date = DateTime(2024, 1, 1);
+    final record =
+        WorkoutRecord('Delete Test', '3set', '100kg x 5', MuscleGroup.back, 7);
+
+    data.addWorkout(date, record);
+    expect(data.workoutsForDay(date).isNotEmpty, true);
+
+    data.deleteWorkout(date, 0);
+    expect(data.workoutsForDay(date).isEmpty, true);
   });
 }
