@@ -7,18 +7,23 @@ import '../models/workout.dart';
 class WorkoutData extends ChangeNotifier {
   static const String _storageKey = 'workoutData';
 
+  static DateTime _day(int offset) {
+    final now = DateTime.now().add(Duration(days: offset));
+    return DateTime(now.year, now.month, now.day);
+  }
+
   final Map<DateTime, List<WorkoutRecord>> _workoutData = {
-    DateTime.now(): [
+    _day(0): [
       WorkoutRecord('벤치프레스', '3세트', '80kg x 10회', MuscleGroup.chest, 8),
       WorkoutRecord('스쿼트', '4세트', '100kg x 8회', MuscleGroup.legs, 9),
       WorkoutRecord('데드리프트', '3세트', '120kg x 5회', MuscleGroup.back, 9),
     ],
-    DateTime.now().subtract(Duration(days: 1)): [
+    _day(-1): [
       WorkoutRecord('풀업', '3세트', '체중 x 12회', MuscleGroup.back, 7),
       WorkoutRecord('딥스', '3세트', '체중 x 15회', MuscleGroup.chest, 6),
       WorkoutRecord('어깨 프레스', '4세트', '40kg x 12회', MuscleGroup.shoulders, 8),
     ],
-    DateTime.now().subtract(Duration(days: 2)): [
+    _day(-2): [
       WorkoutRecord('바이셉 컬', '3세트', '15kg x 15회', MuscleGroup.arms, 6),
       WorkoutRecord('트라이셉 딥', '3세트', '체중 x 12회', MuscleGroup.arms, 7),
       WorkoutRecord('레그 프레스', '4세트', '150kg x 12회', MuscleGroup.legs, 8),
@@ -75,7 +80,8 @@ class WorkoutData extends ChangeNotifier {
     final Map<String, dynamic> jsonData = jsonDecode(jsonString);
     _workoutData.clear();
     jsonData.forEach((key, value) {
-      final date = DateTime.parse(key);
+      final parsed = DateTime.parse(key);
+      final date = DateTime(parsed.year, parsed.month, parsed.day);
       final List<dynamic> list = value as List<dynamic>;
       _workoutData[date] =
           list.map((e) => WorkoutRecord.fromJson(e as Map<String, dynamic>)).toList();

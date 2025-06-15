@@ -11,6 +11,7 @@ class WorkoutLogSection extends StatefulWidget {
   final VoidCallback onAddWorkout;
   final void Function(int) onDeleteWorkout;
   final bool showOnlyHeader;
+  final DraggableScrollableController? sheetController;
 
   const WorkoutLogSection({
     super.key,
@@ -18,6 +19,7 @@ class WorkoutLogSection extends StatefulWidget {
     required this.onAddWorkout,
     required this.onDeleteWorkout,
     this.showOnlyHeader = false,
+    this.sheetController,
   });
 
   @override
@@ -94,8 +96,20 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      itemCount: workouts.length,
+      itemCount: workouts.length + 1,
       itemBuilder: (context, index) {
+        if (index == workouts.length) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8),
+            child: ElevatedButton(
+              onPressed: widget.onAddWorkout,
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Theme.of(context).colorScheme.primary,
+              ),
+              child: const Text('운동 추가'),
+            ),
+          );
+        }
         final workout = workouts[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 8),
@@ -267,6 +281,14 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
       ),
     );
     Overlay.of(context).insert(_restEntry!);
+    if (widget.sheetController != null &&
+        widget.sheetController!.size < 0.25) {
+      widget.sheetController!.animateTo(
+        0.25,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    }
   }
 }
 
@@ -308,16 +330,14 @@ class _RestTimerBarState extends State<RestTimerBar> {
   Widget build(BuildContext context) {
     final progress =
         1 - _secondsLeft / widget.duration.inSeconds.toDouble();
-    return SafeArea(
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Material(
-          elevation: 4,
-          borderRadius: BorderRadius.circular(8),
-          color: Theme.of(context).colorScheme.primary,
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: Material(
+        elevation: 4,
+        color: Theme.of(context).colorScheme.primary,
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: Row(
               children: [
                 Expanded(
                   child: LinearProgressIndicator(
@@ -332,7 +352,6 @@ class _RestTimerBarState extends State<RestTimerBar> {
                   style: const TextStyle(color: Colors.white),
                 ),
               ],
-            ),
           ),
         ),
       ),

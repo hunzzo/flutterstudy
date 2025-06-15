@@ -117,6 +117,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
                   onDeleteWorkout: _deleteWorkout,
                   controller: scrollController,
                   showOnlyHeader: !_expanded,
+                  sheetController: widget.controller,
                 ),
               ),
             ],
