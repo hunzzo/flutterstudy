@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../providers/workout_data.dart';
 import '../../models/workout.dart';
+import '../editable_number.dart';
 
 class WorkoutLogSection extends StatefulWidget {
   final DateTime? selectedDay;
@@ -133,7 +134,12 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
-                        onPressed: () => _showAddSetDialog(context, index),
+                        onPressed: () {
+                          Provider.of<WorkoutData>(context, listen: false).addSet(
+                              widget.selectedDay ?? DateTime.now(),
+                              index,
+                              SetEntry(0, 0));
+                        },
                       ),
                       IconButton(
                         icon: Icon(Icons.delete, color: Colors.red[400]),
@@ -149,8 +155,35 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                       Padding(
                         padding: const EdgeInsets.only(bottom: 4),
                         child: ChoiceChip(
-                          label: Text(
-                              '${workout.setDetails[i].weight}kg x ${workout.setDetails[i].reps}'),
+                          label: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              EditableNumber(
+                                value: workout.setDetails[i].weight,
+                                onChanged: (v) {
+                                  Provider.of<WorkoutData>(context, listen: false)
+                                      .updateSet(
+                                          widget.selectedDay ?? DateTime.now(),
+                                          index,
+                                          i,
+                                          weight: v.toDouble());
+                                },
+                              ),
+                              const Text('kg x '),
+                              EditableNumber(
+                                value: workout.setDetails[i].reps,
+                                integer: true,
+                                onChanged: (v) {
+                                  Provider.of<WorkoutData>(context, listen: false)
+                                      .updateSet(
+                                          widget.selectedDay ?? DateTime.now(),
+                                          index,
+                                          i,
+                                          reps: v.toInt());
+                                },
+                              ),
+                            ],
+                          ),
                           selected: workout.setDetails[i].done,
                           onSelected: (_) {
                             Provider.of<WorkoutData>(context, listen: false)
@@ -178,52 +211,6 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
     return Colors.red;
   }
 
-  void _showAddSetDialog(BuildContext context, int workoutIndex) async {
-    final weightController = TextEditingController();
-    final repsController = TextEditingController();
-    final result = await showDialog<bool>(
-      context: context,
-      builder: (_) => AlertDialog(
-        title: const Text('세트 추가'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: weightController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: '무게(kg)'),
-            ),
-            TextField(
-              controller: repsController,
-              keyboardType: TextInputType.number,
-              decoration: const InputDecoration(labelText: '횟수'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('취소'),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('추가'),
-          ),
-        ],
-      ),
-    );
-
-    if (!context.mounted) return;
-
-    if (result == true) {
-      final weight = double.tryParse(weightController.text) ?? 0;
-      final reps = int.tryParse(repsController.text) ?? 0;
-      Provider.of<WorkoutData>(context, listen: false).addSet(
-          widget.selectedDay ?? DateTime.now(),
-          workoutIndex,
-          SetEntry(weight, reps));
-    }
-  }
 
   void _startRestTimer(BuildContext context) {
     ScaffoldMessenger.of(context).showSnackBar(

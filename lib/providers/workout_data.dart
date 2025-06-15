@@ -117,6 +117,22 @@ class WorkoutData extends ChangeNotifier {
     }
   }
 
+  void updateSet(DateTime day, int workoutIndex, int setIndex,
+      {double? weight, int? reps}) {
+    final key = DateTime(day.year, day.month, day.day);
+    final workout = _workoutData[key]?[workoutIndex];
+    if (workout != null && setIndex < workout.setDetails.length) {
+      final current = workout.setDetails[setIndex];
+      workout.setDetails[setIndex] = SetEntry(
+        weight ?? current.weight,
+        reps ?? current.reps,
+        done: current.done,
+      );
+      notifyListeners();
+      _saveData();
+    }
+  }
+
   int exerciseCount(String exercise) {
     int count = 0;
     _workoutData.forEach((_, list) {
