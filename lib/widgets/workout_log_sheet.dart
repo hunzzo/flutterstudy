@@ -22,6 +22,32 @@ class WorkoutLogSheet extends StatefulWidget {
 
 // 시트의 실제 동작을 담당하는 상태 클래스
 class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
+  bool _expanded = false;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.controller.addListener(_handleDrag);
+  }
+
+  void _handleDrag() {
+    if (!_expanded && widget.controller.size > 0.3) {
+      _expanded = true;
+      widget.controller.animateTo(
+        1.0,
+        duration: const Duration(milliseconds: 300),
+        curve: Curves.easeOut,
+      );
+    } else if (_expanded && widget.controller.size <= 0.25) {
+      _expanded = false;
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.controller.removeListener(_handleDrag);
+    super.dispose();
+  }
   // 운동 추가 페이지로 이동
   void _openAddWorkoutPage() {
     final selectedDate = DateTime(
@@ -52,7 +78,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       controller: widget.controller,
-      minChildSize: 0.25,
+      minChildSize: 0.2,
       initialChildSize: 0.25,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
