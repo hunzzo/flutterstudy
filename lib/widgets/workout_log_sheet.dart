@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-
 // 운동 기록 페이지를 드래그로 펼칠 수 있는 시트 위젯 파일
-import '../providers/workout_data.dart';
-import '../pages/add_workout_page.dart';
 import '../pages/workout_log_page.dart';
+// 공통 동작을 위한 유틸 함수
+import '../utils/workout_log_utils.dart';
+
+/// Bottom sheet variant of [WorkoutLogPage]. It embeds [WorkoutLogBody]
+/// inside a [DraggableScrollableSheet] so the user can drag it up from the
+/// calendar view.
 // 홈 화면에서 사용되는 드래그 가능한 운동 기록 시트 위젯
 class WorkoutLogSheet extends StatefulWidget {
   final DateTime? selectedDay;
@@ -30,6 +32,8 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
     widget.controller.addListener(_handleDrag);
   }
 
+  /// When the sheet is dragged past a certain threshold it automatically
+  /// expands to full height. Dragging it back down collapses it again.
   void _handleDrag() {
     if (!_expanded && widget.controller.size > 0.3) {
       _expanded = true;
@@ -47,31 +51,6 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
   void dispose() {
     widget.controller.removeListener(_handleDrag);
     super.dispose();
-  }
-  // 운동 추가 페이지로 이동
-  void _openAddWorkoutPage() {
-    final selectedDate = DateTime(
-      widget.selectedDay!.year,
-      widget.selectedDay!.month,
-      widget.selectedDay!.day,
-    );
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => AddWorkoutPage(selectedDate: selectedDate),
-      ),
-    );
-  }
-
-  // 운동 기록 삭제 처리
-  void _deleteWorkout(int index) {
-    final selectedDate = DateTime(
-      widget.selectedDay!.year,
-      widget.selectedDay!.month,
-      widget.selectedDay!.day,
-    );
-
-    final provider = Provider.of<WorkoutData>(context, listen: false);
-    provider.deleteWorkout(selectedDate, index);
   }
 
   @override
@@ -110,11 +89,14 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
                   ),
                 ),
               ),
+              // Reuse the same body widget as the full page.
               Expanded(
                 child: WorkoutLogBody(
                   selectedDay: widget.selectedDay,
-                  onAddWorkout: _openAddWorkoutPage,
-                  onDeleteWorkout: _deleteWorkout,
+                  onAddWorkout: () => openAddWorkoutPage(
+                      context, widget.selectedDay!),
+                  onDeleteWorkout: (i) =>
+                      deleteWorkout(context, widget.selectedDay!, i),
                   controller: scrollController,
                   showOnlyHeader: !_expanded,
                   sheetController: widget.controller,

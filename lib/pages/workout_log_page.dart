@@ -7,8 +7,12 @@ import 'dart:async';
 import '../providers/workout_data.dart';
 import '../models/workout.dart';
 import '../widgets/editable_number.dart';
-// 운동 추가 페이지
-import 'add_workout_page.dart';
+// 공통 동작을 모아둔 유틸 함수
+import '../utils/workout_log_utils.dart';
+
+/// This file defines both the full screen workout log page and the reusable
+/// [WorkoutLogBody] widget that is also embedded in [WorkoutLogSheet]. The
+/// sheet simply wraps this body in a [DraggableScrollableSheet].
 
 // 전체 화면이나 시트에서 재사용할 운동 기록 목록 본문 위젯
 class WorkoutLogBody extends StatefulWidget {
@@ -75,44 +79,22 @@ class WorkoutLogPage extends StatefulWidget {
 
 // WorkoutLogPage의 상태 클래스
 class _WorkoutLogPageState extends State<WorkoutLogPage> {
-  // 운동 추가 페이지로 이동
-  void _openAddWorkoutPage() {
-    final selectedDate = DateTime(
-      widget.selectedDay!.year,
-      widget.selectedDay!.month,
-      widget.selectedDay!.day,
-    );
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => AddWorkoutPage(selectedDate: selectedDate),
-      ),
-    );
-  }
-
-  // 운동 기록 삭제 처리
-  void _deleteWorkout(int index) {
-    final selectedDate = DateTime(
-      widget.selectedDay!.year,
-      widget.selectedDay!.month,
-      widget.selectedDay!.day,
-    );
-
-    final provider = Provider.of<WorkoutData>(context, listen: false);
-    provider.deleteWorkout(selectedDate, index);
-  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: const Text('오늘의 운동')),
+      // Reusable body shared with [WorkoutLogSheet].
       body: WorkoutLogBody(
         selectedDay: widget.selectedDay,
-        onAddWorkout: _openAddWorkoutPage,
-        onDeleteWorkout: _deleteWorkout,
+        onAddWorkout: () =>
+            openAddWorkoutPage(context, widget.selectedDay!),
+        onDeleteWorkout: (i) =>
+            deleteWorkout(context, widget.selectedDay!, i),
         sheetController: null,
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _openAddWorkoutPage,
+        onPressed: () => openAddWorkoutPage(context, widget.selectedDay!),
         child: const Icon(Icons.add),
       ),
     );
