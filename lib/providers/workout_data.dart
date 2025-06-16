@@ -14,19 +14,28 @@ class WorkoutData extends ChangeNotifier {
 
   final Map<DateTime, List<WorkoutRecord>> _workoutData = {
     _day(0): [
-      WorkoutRecord('벤치프레스', '3세트', '80kg x 10회', MuscleGroup.chest, 8),
-      WorkoutRecord('스쿼트', '4세트', '100kg x 8회', MuscleGroup.legs, 9),
-      WorkoutRecord('데드리프트', '3세트', '120kg x 5회', MuscleGroup.back, 9),
+      WorkoutRecord('Bench Press', '3 sets', '80kg x 10', MuscleGroup.chest,
+          IntensityLevel.medium),
+      WorkoutRecord('Squat', '4 sets', '100kg x 8', MuscleGroup.legs,
+          IntensityLevel.high),
+      WorkoutRecord('Deadlift', '3 sets', '120kg x 5', MuscleGroup.back,
+          IntensityLevel.high),
     ],
     _day(-1): [
-      WorkoutRecord('풀업', '3세트', '체중 x 12회', MuscleGroup.back, 7),
-      WorkoutRecord('딥스', '3세트', '체중 x 15회', MuscleGroup.chest, 6),
-      WorkoutRecord('어깨 프레스', '4세트', '40kg x 12회', MuscleGroup.shoulders, 8),
+      WorkoutRecord('Pull Up', '3 sets', 'Bodyweight x 12', MuscleGroup.back,
+          IntensityLevel.low),
+      WorkoutRecord('Dip', '3 sets', 'Bodyweight x 15', MuscleGroup.chest,
+          IntensityLevel.low),
+      WorkoutRecord('Shoulder Press', '4 sets', '40kg x 12',
+          MuscleGroup.shoulders, IntensityLevel.medium),
     ],
     _day(-2): [
-      WorkoutRecord('바이셉 컬', '3세트', '15kg x 15회', MuscleGroup.arms, 6),
-      WorkoutRecord('트라이셉 딥', '3세트', '체중 x 12회', MuscleGroup.arms, 7),
-      WorkoutRecord('레그 프레스', '4세트', '150kg x 12회', MuscleGroup.legs, 8),
+      WorkoutRecord('Bicep Curl', '3 sets', '15kg x 15', MuscleGroup.arms,
+          IntensityLevel.low),
+      WorkoutRecord('Tricep Dip', '3 sets', 'Bodyweight x 12', MuscleGroup.arms,
+          IntensityLevel.low),
+      WorkoutRecord('Leg Press', '4 sets', '150kg x 12', MuscleGroup.legs,
+          IntensityLevel.medium),
     ],
   };
 
@@ -98,11 +107,23 @@ class WorkoutData extends ChangeNotifier {
     await prefs.setString(_storageKey, jsonEncode(jsonData));
   }
 
-  void addSet(DateTime day, int workoutIndex, SetEntry set) {
+  void addSet(DateTime day, int workoutIndex) {
     final key = DateTime(day.year, day.month, day.day);
     final workout = _workoutData[key]?[workoutIndex];
     if (workout != null) {
-      workout.setDetails.add(set);
+      double weight = 0;
+      int reps = 0;
+      if (workout.setDetails.isNotEmpty) {
+        weight = workout.setDetails.last.weight;
+        reps = workout.setDetails.last.reps;
+      } else {
+        final latest = latestRecordForExercise(workout.exercise);
+        if (latest != null && latest.setDetails.isNotEmpty) {
+          weight = latest.setDetails.last.weight;
+          reps = latest.setDetails.last.reps;
+        }
+      }
+      workout.setDetails.add(SetEntry(weight, reps));
       notifyListeners();
       _saveData();
     }
@@ -144,6 +165,17 @@ class WorkoutData extends ChangeNotifier {
         reps ?? current.reps,
         done: current.done,
       );
+      notifyListeners();
+      _saveData();
+    }
+  }
+
+  void updateIntensity(
+      DateTime day, int workoutIndex, IntensityLevel intensity) {
+    final key = DateTime(day.year, day.month, day.day);
+    final workout = _workoutData[key]?[workoutIndex];
+    if (workout != null) {
+      workout.intensity = intensity;
       notifyListeners();
       _saveData();
     }
