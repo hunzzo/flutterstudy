@@ -79,7 +79,6 @@ class WorkoutLogPage extends StatefulWidget {
 
 // WorkoutLogPage의 상태 클래스
 class _WorkoutLogPageState extends State<WorkoutLogPage> {
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -87,10 +86,8 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
       // Reusable body shared with [WorkoutLogSheet].
       body: WorkoutLogBody(
         selectedDay: widget.selectedDay,
-        onAddWorkout: () =>
-            openAddWorkoutPage(context, widget.selectedDay!),
-        onDeleteWorkout: (i) =>
-            deleteWorkout(context, widget.selectedDay!, i),
+        onAddWorkout: () => openAddWorkoutPage(context, widget.selectedDay!),
+        onDeleteWorkout: (i) => deleteWorkout(context, widget.selectedDay!, i),
         sheetController: null,
       ),
       floatingActionButton: FloatingActionButton(
@@ -143,8 +140,10 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
         children: [
           Row(
             children: [
-              Icon(Icons.fitness_center,
-                  color: Theme.of(context).colorScheme.primary),
+              Icon(
+                Icons.fitness_center,
+                color: Theme.of(context).colorScheme.primary,
+              ),
               const SizedBox(width: 8),
               Text(
                 widget.selectedDay != null
@@ -154,10 +153,8 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
               ),
             ],
           ),
-          if (!widget.showOnlyHeader) ...[
-            const SizedBox(height: 16),
-            _buildWorkoutList(context),
-          ],
+
+          _buildWorkoutList(context),
         ],
       ),
     );
@@ -165,8 +162,9 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
 
   Widget _buildWorkoutList(BuildContext context) {
     final provider = Provider.of<WorkoutData>(context);
-    final workouts =
-        provider.workoutsForDay(widget.selectedDay ?? DateTime.now());
+    final workouts = provider.workoutsForDay(
+      widget.selectedDay ?? DateTime.now(),
+    );
 
     if (workouts.isEmpty) {
       return SizedBox(
@@ -179,10 +177,9 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
               const SizedBox(height: 16),
               Text(
                 '이 날의 운동 기록이 없습니다',
-                style: Theme.of(context)
-                    .textTheme
-                    .bodySmall
-                    ?.copyWith(fontSize: 16),
+                style: Theme.of(
+                  context,
+                ).textTheme.bodySmall?.copyWith(fontSize: 16),
               ),
               const SizedBox(height: 8),
               ElevatedButton(
@@ -227,17 +224,19 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                 ListTile(
                   contentPadding: EdgeInsets.zero,
                   leading: CircleAvatar(
-                    backgroundColor:
-                        Theme.of(context).colorScheme.primary.withAlpha(51),
-                    child: Icon(Icons.fitness_center,
-                        color: Theme.of(context).colorScheme.primary),
+                    backgroundColor: Theme.of(
+                      context,
+                    ).colorScheme.primary.withAlpha(51),
+                    child: Icon(
+                      Icons.fitness_center,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
                   ),
                   title: Text(
                     workout.exercise,
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodyLarge
-                        ?.copyWith(fontWeight: FontWeight.bold),
+                    style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   subtitle: Text('${workout.sets} | ${workout.details}'),
                   trailing: Row(
@@ -245,24 +244,32 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                     children: [
                       Container(
                         padding: const EdgeInsets.symmetric(
-                            horizontal: 8, vertical: 4),
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
                         decoration: BoxDecoration(
                           color: _getIntensityColor(workout.intensity),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           '강도 ${workout.intensity}',
-                          style:
-                              const TextStyle(color: Colors.white, fontSize: 12),
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 12,
+                          ),
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed: () {
-                          Provider.of<WorkoutData>(context, listen: false).addSet(
-                              widget.selectedDay ?? DateTime.now(),
-                              index,
-                              SetEntry(0, 0));
+                          Provider.of<WorkoutData>(
+                            context,
+                            listen: false,
+                          ).addSet(
+                            widget.selectedDay ?? DateTime.now(),
+                            index,
+                            SetEntry(0, 0),
+                          );
                         },
                       ),
                       IconButton(
@@ -285,31 +292,45 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                             alignment: Alignment.centerRight,
                             padding: const EdgeInsets.symmetric(horizontal: 16),
                             color: Colors.red,
-                            child: const Icon(Icons.delete, color: Colors.white),
+                            child: const Icon(
+                              Icons.delete,
+                              color: Colors.white,
+                            ),
                           ),
                           onDismissed: (_) {
-                            Provider.of<WorkoutData>(context, listen: false)
-                                .deleteSet(widget.selectedDay ?? DateTime.now(),
-                                    index, i);
+                            Provider.of<WorkoutData>(
+                              context,
+                              listen: false,
+                            ).deleteSet(
+                              widget.selectedDay ?? DateTime.now(),
+                              index,
+                              i,
+                            );
                           },
                           child: SizedBox(
                             width: double.infinity,
                             child: Material(
                               color: workout.setDetails[i].done
                                   ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(context).colorScheme.surfaceVariant,
+                                  : Theme.of(
+                                      context,
+                                    ).colorScheme.surfaceVariant,
                               child: InkWell(
                                 onTap: () {
-                                  Provider.of<WorkoutData>(context, listen: false)
-                                      .toggleSetDone(
-                                          widget.selectedDay ?? DateTime.now(),
-                                          index,
-                                          i);
+                                  Provider.of<WorkoutData>(
+                                    context,
+                                    listen: false,
+                                  ).toggleSetDone(
+                                    widget.selectedDay ?? DateTime.now(),
+                                    index,
+                                    i,
+                                  );
                                   _startRestTimer(context);
                                 },
                                 child: Padding(
-                                  padding:
-                                      const EdgeInsets.symmetric(vertical: 8),
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 8,
+                                  ),
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.max,
@@ -317,14 +338,16 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                                       EditableNumber(
                                         value: workout.setDetails[i].weight,
                                         onChanged: (v) {
-                                          Provider.of<WorkoutData>(context,
-                                                  listen: false)
-                                              .updateSet(
-                                                  widget.selectedDay ??
-                                                      DateTime.now(),
-                                                  index,
-                                                  i,
-                                                  weight: v.toDouble());
+                                          Provider.of<WorkoutData>(
+                                            context,
+                                            listen: false,
+                                          ).updateSet(
+                                            widget.selectedDay ??
+                                                DateTime.now(),
+                                            index,
+                                            i,
+                                            weight: v.toDouble(),
+                                          );
                                         },
                                       ),
                                       const Text('kg x '),
@@ -332,14 +355,16 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                                         value: workout.setDetails[i].reps,
                                         integer: true,
                                         onChanged: (v) {
-                                          Provider.of<WorkoutData>(context,
-                                                  listen: false)
-                                              .updateSet(
-                                                  widget.selectedDay ??
-                                                      DateTime.now(),
-                                                  index,
-                                                  i,
-                                                  reps: v.toInt());
+                                          Provider.of<WorkoutData>(
+                                            context,
+                                            listen: false,
+                                          ).updateSet(
+                                            widget.selectedDay ??
+                                                DateTime.now(),
+                                            index,
+                                            i,
+                                            reps: v.toInt(),
+                                          );
                                         },
                                       ),
                                     ],
@@ -348,7 +373,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                               ),
                             ),
                           ),
-                      ),
+                        ),
                       ),
                   ],
                 ),
@@ -385,8 +410,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
       ),
     );
     Overlay.of(context).insert(_restEntry!);
-    if (widget.sheetController != null &&
-        widget.sheetController!.size < 0.25) {
+    if (widget.sheetController != null && widget.sheetController!.size < 0.25) {
       widget.sheetController!.animateTo(
         0.25,
         duration: const Duration(milliseconds: 300),
@@ -400,7 +424,11 @@ class RestTimerBar extends StatefulWidget {
   final Duration duration;
   final VoidCallback onFinished;
 
-  const RestTimerBar({super.key, required this.duration, required this.onFinished});
+  const RestTimerBar({
+    super.key,
+    required this.duration,
+    required this.onFinished,
+  });
 
   @override
   State<RestTimerBar> createState() => _RestTimerBarState();
@@ -432,8 +460,7 @@ class _RestTimerBarState extends State<RestTimerBar> {
 
   @override
   Widget build(BuildContext context) {
-    final progress =
-        1 - _secondsLeft / widget.duration.inSeconds.toDouble();
+    final progress = 1 - _secondsLeft / widget.duration.inSeconds.toDouble();
     return Material(
       elevation: 4,
       color: Theme.of(context).colorScheme.primary,
@@ -449,10 +476,7 @@ class _RestTimerBarState extends State<RestTimerBar> {
               ),
             ),
             const SizedBox(width: 12),
-            Text(
-              '$_secondsLeft초',
-              style: const TextStyle(color: Colors.white),
-            ),
+            Text('$_secondsLeft초', style: const TextStyle(color: Colors.white)),
           ],
         ),
       ),
