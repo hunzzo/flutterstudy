@@ -14,8 +14,13 @@ void main() {
   test('addWorkout stores a workout record', () async {
     final data = WorkoutData();
     final date = DateTime(2024, 1, 1);
-    final record =
-        WorkoutRecord('Bench Test', '3set', '80kg x 10', MuscleGroup.chest, 8);
+    final record = WorkoutRecord(
+      'Bench Test',
+      '3 sets',
+      '80kg x 10',
+      MuscleGroup.chest,
+      IntensityLevel.medium,
+    );
 
     data.addWorkout(date, record);
 
@@ -27,8 +32,13 @@ void main() {
   test('deleteWorkout removes the workout record', () async {
     final data = WorkoutData();
     final date = DateTime(2024, 1, 1);
-    final record =
-        WorkoutRecord('Delete Test', '3set', '100kg x 5', MuscleGroup.back, 7);
+    final record = WorkoutRecord(
+      'Delete Test',
+      '3 sets',
+      '100kg x 5',
+      MuscleGroup.back,
+      IntensityLevel.low,
+    );
 
     data.addWorkout(date, record);
     expect(data.workoutsForDay(date).isNotEmpty, true);

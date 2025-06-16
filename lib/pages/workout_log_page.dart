@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'dart:async';
@@ -242,20 +243,23 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: _getIntensityColor(workout.intensity),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Text(
-                          '강도 ${workout.intensity}',
-                          style: const TextStyle(
-                            color: Colors.white,
-                            fontSize: 12,
+                      GestureDetector(
+                        onTap: () => _editIntensity(context, index),
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 8,
+                            vertical: 4,
+                          ),
+                          decoration: BoxDecoration(
+                            color: _getIntensityColor(workout.intensity),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            workout.intensity.label,
+                            style: const TextStyle(
+                              color: Colors.white,
+                              fontSize: 12,
+                            ),
                           ),
                         ),
                       ),
@@ -268,7 +272,6 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                           ).addSet(
                             widget.selectedDay ?? DateTime.now(),
                             index,
-                            SetEntry(0, 0),
                           );
                         },
                       ),
@@ -307,71 +310,11 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                               i,
                             );
                           },
-                          child: SizedBox(
-                            width: double.infinity,
-                            child: Material(
-                              color: workout.setDetails[i].done
-                                  ? Theme.of(context).colorScheme.primary
-                                  : Theme.of(
-                                      context,
-                                    ).colorScheme.surfaceVariant,
-                              child: InkWell(
-                                onTap: () {
-                                  Provider.of<WorkoutData>(
-                                    context,
-                                    listen: false,
-                                  ).toggleSetDone(
-                                    widget.selectedDay ?? DateTime.now(),
-                                    index,
-                                    i,
-                                  );
-                                  _startRestTimer(context);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 8,
-                                  ),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    mainAxisSize: MainAxisSize.max,
-                                    children: [
-                                      EditableNumber(
-                                        value: workout.setDetails[i].weight,
-                                        onChanged: (v) {
-                                          Provider.of<WorkoutData>(
-                                            context,
-                                            listen: false,
-                                          ).updateSet(
-                                            widget.selectedDay ??
-                                                DateTime.now(),
-                                            index,
-                                            i,
-                                            weight: v.toDouble(),
-                                          );
-                                        },
-                                      ),
-                                      const Text('kg x '),
-                                      EditableNumber(
-                                        value: workout.setDetails[i].reps,
-                                        integer: true,
-                                        onChanged: (v) {
-                                          Provider.of<WorkoutData>(
-                                            context,
-                                            listen: false,
-                                          ).updateSet(
-                                            widget.selectedDay ??
-                                                DateTime.now(),
-                                            index,
-                                            i,
-                                            reps: v.toInt(),
-                                          );
-                                        },
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                            ),
+                          child: _SetRow(
+                            day: widget.selectedDay ?? DateTime.now(),
+                            workoutIndex: index,
+                            setIndex: i,
+                            onToggle: () => _startRestTimer(context),
                           ),
                         ),
                       ),
@@ -385,10 +328,56 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
     );
   }
 
-  Color _getIntensityColor(int intensity) {
-    if (intensity <= 3) return Colors.green;
-    if (intensity <= 6) return Colors.orange;
-    return Colors.red;
+  Color _getIntensityColor(IntensityLevel level) {
+    switch (level) {
+      case IntensityLevel.warmup:
+        return Colors.green;
+      case IntensityLevel.low:
+        return Colors.lightGreen;
+      case IntensityLevel.medium:
+        return Colors.orange;
+      case IntensityLevel.high:
+        return Colors.red;
+    }
+  }
+
+  void _editIntensity(BuildContext context, int workoutIndex) {
+    final provider = Provider.of<WorkoutData>(context, listen: false);
+    final workouts = provider.workoutsForDay(widget.selectedDay ?? DateTime.now());
+    final current = workouts[workoutIndex].intensity;
+    int selectedIndex = IntensityLevel.values.indexOf(current);
+    showModalBottomSheet(
+      context: context,
+      builder: (_) {
+        return SizedBox(
+          height: 200,
+          child: Column(
+            children: [
+              Expanded(
+                child: CupertinoPicker(
+                  scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                  itemExtent: 32,
+                  onSelectedItemChanged: (i) => selectedIndex = i,
+                  children: IntensityLevel.values
+                      .map((e) => Center(child: Text(e.label)))
+                      .toList(),
+                ),
+              ),
+              TextButton(
+                onPressed: () {
+                  provider.updateIntensity(
+                      widget.selectedDay ?? DateTime.now(),
+                      workoutIndex,
+                      IntensityLevel.values[selectedIndex]);
+                  Navigator.pop(context);
+                },
+                child: const Text('확인'),
+              )
+            ],
+          ),
+        );
+      },
+    );
   }
 
   OverlayEntry? _restEntry;
@@ -480,6 +469,102 @@ class _RestTimerBarState extends State<RestTimerBar> {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _SetRow extends StatefulWidget {
+  final DateTime day;
+  final int workoutIndex;
+  final int setIndex;
+  final VoidCallback onToggle;
+
+  const _SetRow({
+    required this.day,
+    required this.workoutIndex,
+    required this.setIndex,
+    required this.onToggle,
+  });
+
+  @override
+  State<_SetRow> createState() => _SetRowState();
+}
+
+class _SetRowState extends State<_SetRow> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final provider = Provider.of<WorkoutData>(context);
+    final workout = provider.workoutsForDay(widget.day)[widget.workoutIndex];
+    final set = workout.setDetails[widget.setIndex];
+
+    return Column(
+      children: [
+        Material(
+          color: set.done
+              ? Theme.of(context).colorScheme.primary
+              : Theme.of(context).colorScheme.surfaceVariant,
+          child: InkWell(
+            onTap: () {
+              provider.toggleSetDone(
+                  widget.day, widget.workoutIndex, widget.setIndex);
+              widget.onToggle();
+            },
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 8),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text('${set.weight.toStringAsFixed(1)}kg x ${set.reps}'),
+                  IconButton(
+                    icon: Icon(
+                        _expanded ? Icons.expand_less : Icons.expand_more),
+                    onPressed: () => setState(() => _expanded = !_expanded),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+        if (_expanded)
+          Container(
+            color: Theme.of(context).colorScheme.surfaceVariant,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () => provider.updateSet(
+                      widget.day, widget.workoutIndex, widget.setIndex,
+                      weight: set.weight - 2.5),
+                ),
+                Text('${set.weight.toStringAsFixed(1)}kg'),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => provider.updateSet(
+                      widget.day, widget.workoutIndex, widget.setIndex,
+                      weight: set.weight + 2.5),
+                ),
+                const SizedBox(width: 16),
+                IconButton(
+                  icon: const Icon(Icons.remove),
+                  onPressed: () => provider.updateSet(
+                      widget.day, widget.workoutIndex, widget.setIndex,
+                      reps: set.reps - 1),
+                ),
+                Text('${set.reps}회'),
+                IconButton(
+                  icon: const Icon(Icons.add),
+                  onPressed: () => provider.updateSet(
+                      widget.day, widget.workoutIndex, widget.setIndex,
+                      reps: set.reps + 1),
+                ),
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

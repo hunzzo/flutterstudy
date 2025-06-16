@@ -37,7 +37,7 @@ class _MuscleRecoverySectionState extends State<MuscleRecoverySection> {
         MuscleRecoveryInfo current = recoveryStatus[workout.muscleGroup]!;
 
         double timeFactor = 1.0 - (i * 0.3);
-        double damage = workout.intensity * timeFactor;
+        double damage = workout.intensity.value * timeFactor;
 
         if (damage > current.damageLevel) {
           recoveryStatus[workout.muscleGroup] = MuscleRecoveryInfo(

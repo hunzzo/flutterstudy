@@ -213,12 +213,18 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
       if (last != null) {
         provider.addWorkout(
           widget.selectedDate,
-          WorkoutRecord(ex, last.sets, last.details, last.muscleGroup, last.intensity),
+          WorkoutRecord(
+            ex,
+            last.sets,
+            last.details,
+            last.muscleGroup,
+            last.intensity,
+          ),
         );
       } else {
         provider.addWorkout(
           widget.selectedDate,
-          WorkoutRecord(ex, '', '', MuscleGroup.chest, 5),
+          WorkoutRecord(ex, '', '', MuscleGroup.chest),
         );
       }
     }

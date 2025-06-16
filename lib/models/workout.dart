@@ -1,5 +1,42 @@
 enum MuscleGroup { chest, back, shoulders, arms, legs, core }
 
+enum IntensityLevel { warmup, low, medium, high }
+
+extension IntensityLevelExtension on IntensityLevel {
+  String get label {
+    switch (this) {
+      case IntensityLevel.warmup:
+        return '워밍업';
+      case IntensityLevel.low:
+        return '저강도';
+      case IntensityLevel.medium:
+        return '중강도';
+      case IntensityLevel.high:
+        return '고강도';
+    }
+  }
+
+  static IntensityLevel fromLabel(String label) {
+    return IntensityLevel.values.firstWhere(
+      (e) => e.label == label,
+      orElse: () => IntensityLevel.medium,
+    );
+  }
+
+  double get value {
+    switch (this) {
+      case IntensityLevel.warmup:
+        return 1;
+      case IntensityLevel.low:
+        return 2;
+      case IntensityLevel.medium:
+        return 3;
+      case IntensityLevel.high:
+        return 4;
+    }
+  }
+}
+
 extension MuscleGroupExtension on MuscleGroup {
   String get name => toString().split('.').last;
 
@@ -14,7 +51,7 @@ class WorkoutRecord {
   final String sets;
   final String details;
   final MuscleGroup muscleGroup;
-  final int intensity; // 1-10 scale
+  IntensityLevel intensity;
   final List<SetEntry> setDetails;
 
   WorkoutRecord(
@@ -22,8 +59,8 @@ class WorkoutRecord {
     this.sets,
     this.details,
     this.muscleGroup,
-    this.intensity,
-    [List<SetEntry>? setDetails]
+    [this.intensity = IntensityLevel.medium,
+    List<SetEntry>? setDetails]
   ) : setDetails = setDetails ?? [];
 
   Map<String, dynamic> toJson() => {
@@ -31,7 +68,7 @@ class WorkoutRecord {
         'sets': sets,
         'details': details,
         'muscleGroup': muscleGroup.name,
-        'intensity': intensity,
+        'intensity': intensity.name,
         'setDetails': setDetails.map((e) => e.toJson()).toList(),
       };
 
@@ -41,7 +78,10 @@ class WorkoutRecord {
       json['sets'] as String,
       json['details'] as String,
       MuscleGroupExtension.fromName(json['muscleGroup'] as String),
-      json['intensity'] as int,
+      IntensityLevel.values.firstWhere(
+        (e) => e.name == json['intensity'],
+        orElse: () => IntensityLevel.medium,
+      ),
       (json['setDetails'] as List<dynamic>?)
               ?.map((e) => SetEntry.fromJson(e as Map<String, dynamic>))
               .toList() ??
