@@ -63,6 +63,22 @@ class WorkoutRecord {
     List<SetEntry>? setDetails]
   ) : setDetails = setDetails ?? [];
 
+  /// Returns the [SetEntry] with the largest training volume
+  /// (weight x reps) or `null` if there are no recorded sets.
+  SetEntry? get maxVolumeSet {
+    if (setDetails.isEmpty) return null;
+    return setDetails.reduce((a, b) =>
+        (a.weight * a.reps) >= (b.weight * b.reps) ? a : b);
+  }
+
+  /// Formatted text describing the highest volume set.
+  /// Returns an empty string when no sets exist.
+  String get maxVolumeSummary {
+    final best = maxVolumeSet;
+    if (best == null) return '';
+    return '${best.weight.toStringAsFixed(1)}kg x ${best.reps}';
+  }
+
   Map<String, dynamic> toJson() => {
         'exercise': exercise,
         'sets': sets,
