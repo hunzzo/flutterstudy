@@ -25,6 +25,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   // 운동 기록 시트 제어용 컨트롤러
   late DraggableScrollableController _sheetController;
   int _currentPage = 1;
+  bool _hideAppBar = false;
 
   @override
   void initState() {
@@ -34,35 +35,40 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       initialPage: _currentPage,
     );
     _sheetController = DraggableScrollableController();
+    _sheetController.addListener(_handleSheetChange);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('운동 기록'),
+      appBar: _hideAppBar
+          ? null
+          : AppBar(
+              title: const Text('운동 기록'),
 
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        elevation: 0,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'settings') {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SettingsPage()),
-                );
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: 'settings',
-                child: Text('설정'),
-              ),
-            ],
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              elevation: 0,
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'settings') {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsPage(),
+                        ),
+                      );
+                    }
+                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 'settings',
+                      child: Text('설정'),
+                    ),
+                  ],
 
-          ),
-        ],
-      ),
+                ),
+              ],
+            ),
       body: PageView(
         controller: _pageController,
         scrollDirection: Axis.vertical,
@@ -108,6 +114,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               WorkoutLogSheet(
                 selectedDay: _selectedDay,
                 controller: _sheetController,
+                expanded: _hideAppBar,
               ),
             ],
           ),
@@ -136,8 +143,16 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     );
   }
 
+  void _handleSheetChange() {
+    final hide = _sheetController.size > 0.95;
+    if (hide != _hideAppBar) {
+      setState(() => _hideAppBar = hide);
+    }
+  }
+
   @override
   void dispose() {
+    _sheetController.removeListener(_handleSheetChange);
     _pageController.dispose();
     super.dispose();
   }
