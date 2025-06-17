@@ -24,6 +24,7 @@ class WorkoutLogBody extends StatefulWidget {
   final bool showOnlyHeader;
   final DraggableScrollableController? sheetController;
   final bool showAsAppBar;
+  final bool showAsAppBar;
 
   const WorkoutLogBody({
     super.key,
@@ -110,7 +111,6 @@ class WorkoutLogSection extends StatefulWidget {
   final void Function(int) onDeleteWorkout;
   final bool showOnlyHeader;
   final DraggableScrollableController? sheetController;
-  final bool showAsAppBar;
 
   const WorkoutLogSection({
     super.key,
@@ -556,7 +556,7 @@ class _SetRowState extends State<_SetRow> {
         Material(
           color: set.done
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceContainerHighest,
+              : Theme.of(context).colorScheme.surfaceVariant,
           child: InkWell(
             onTap: () {
               provider.toggleSetDone(
@@ -580,7 +580,7 @@ class _SetRowState extends State<_SetRow> {
         ),
         if (_expanded)
           Container(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest,
+            color: Theme.of(context).colorScheme.surfaceVariant,
             padding: const EdgeInsets.symmetric(vertical: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,

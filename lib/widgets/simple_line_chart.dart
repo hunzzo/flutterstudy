@@ -32,8 +32,9 @@ class _LineChartPainter extends CustomPainter {
   final double minY;
   final double maxY;
 
-  _LineChartPainter(this.values, double? minY, double? maxY)
-      : minY = minY ?? (values.isEmpty ? 0 : values.reduce(min)),
+  _LineChartPainter(List<double> values, double? minY, double? maxY)
+      : values = values,
+        minY = minY ?? (values.isEmpty ? 0 : values.reduce(min)),
         maxY = maxY ?? (values.isEmpty ? 0 : values.reduce(max));
 
   @override
