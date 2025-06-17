@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../simple_line_chart.dart';
+
 import '../../providers/exercise_presets.dart';
 import '../../providers/workout_data.dart';
 
 class FavoriteProgressSection extends StatelessWidget {
-  const FavoriteProgressSection({super.key});
+  final VoidCallback? onScrollDown;
+
+  const FavoriteProgressSection({super.key, this.onScrollDown});
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +40,21 @@ class FavoriteProgressSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ListView(
-              children: favorites
-                  .map((e) => _buildItem(context, e, data))
-                  .toList(),
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent &&
+                    notification is OverscrollNotification &&
+                    notification.overscroll > 0) {
+                  onScrollDown?.call();
+                }
+                return false;
+              },
+              child: ListView(
+                children: favorites
+                    .map((e) => _buildItem(context, e, data))
+                    .toList(),
+              ),
             ),
           ),
         ],
@@ -60,9 +75,37 @@ class FavoriteProgressSection extends StatelessWidget {
       text = '변화 없음';
     }
 
-    return ListTile(
-      title: Text(exercise),
-      trailing: Text(text),
+    final weights = _weightHistory(data, exercise);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 8),
+      child: Padding(
+        padding: const EdgeInsets.all(12),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  exercise,
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodyLarge
+                      ?.copyWith(fontWeight: FontWeight.bold),
+                ),
+                Text(text),
+              ],
+            ),
+            const SizedBox(height: 8),
+            if (weights.length > 1)
+              SimpleLineChart(
+                values: weights,
+                height: 80,
+              ),
+          ],
+        ),
+      ),
     );
   }
 
@@ -88,5 +131,32 @@ class FavoriteProgressSection extends StatelessWidget {
     list.sort((a, b) => a.key.compareTo(b.key));
     if (list.length < 2) return null;
     return list.last.value - list[list.length - 2].value;
+  }
+
+  List<double> _weightHistory(WorkoutData data, String exercise) {
+    final map = data.allWorkoutData;
+    List<MapEntry<DateTime, double>> list = [];
+    map.forEach((date, records) {
+      for (final r in records) {
+        if (r.exercise == exercise) {
+          double? w;
+          if (r.setDetails.isNotEmpty) {
+            w = r.setDetails.first.weight;
+          } else {
+            final m = RegExp(r'(\d+(?:\.\d+)?)kg').firstMatch(r.details);
+            if (m != null) w = double.tryParse(m.group(1)!);
+          }
+          if (w != null) {
+            list.add(MapEntry(date, w));
+          }
+        }
+      }
+    });
+    list.sort((a, b) => a.key.compareTo(b.key));
+    final values = list.map((e) => e.value).toList();
+    if (values.length > 7) {
+      return values.sublist(values.length - 7);
+    }
+    return values;
   }
 }

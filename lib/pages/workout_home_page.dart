@@ -72,7 +72,9 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           });
         },
         children: [
-          const MuscleRecoverySection(),
+          MuscleRecoverySection(
+            onScrollDownFromFavorites: _goToCalendar,
+          ),
           Stack(
             children: [
               GestureDetector(
@@ -125,6 +127,13 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
         _focusedDay = DateTime(_focusedDay.year, _focusedDay.month - 1, 1);
       });
     }
+  }
+
+  void _goToCalendar() {
+    _pageController.nextPage(
+      duration: const Duration(milliseconds: 300),
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
