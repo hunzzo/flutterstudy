@@ -135,24 +135,46 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     return Container(
       color: isDark ? Colors.grey[900] : Colors.grey[50],
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(
-                Icons.fitness_center,
-                color: Theme.of(context).colorScheme.primary,
-              ),
-              const SizedBox(width: 8),
-              Text(
-                widget.selectedDay != null
-                    ? '${widget.selectedDay!.month}월 ${widget.selectedDay!.day}일 운동 기록'
-                    : '오늘의 운동 기록',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
+          Padding(
+            padding: const EdgeInsets.symmetric(vertical: 20),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.fitness_center,
+                      color: Theme.of(context).colorScheme.primary,
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      widget.selectedDay != null
+                          ? '${widget.selectedDay!.month}월 ${widget.selectedDay!.day}일 운동 기록'
+                          : '오늘의 운동 기록',
+                      style: Theme.of(context).textTheme.titleLarge,
+                    ),
+                  ],
+                ),
+                Row(
+                  children: [
+                    ElevatedButton(
+                      onPressed: widget.onAddWorkout,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Theme.of(context).colorScheme.primary,
+                      ),
+                      child: Text(
+                        '운동 기록 추가',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
           ),
 
           _buildWorkoutList(context),
@@ -188,7 +210,10 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Theme.of(context).colorScheme.primary,
                 ),
-                child: const Text('운동 기록 추가'),
+                child: const Text(
+                  '운동 기록 추가',
+                  style: TextStyle(color: Colors.white),
+                ),
               ),
             ],
           ),
