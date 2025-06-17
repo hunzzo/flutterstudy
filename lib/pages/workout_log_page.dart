@@ -23,8 +23,6 @@ class WorkoutLogBody extends StatefulWidget {
   final void Function(int) onDeleteWorkout;
   final bool showOnlyHeader;
   final DraggableScrollableController? sheetController;
-  final bool showAsAppBar;
-  final bool showAsAppBar;
 
   const WorkoutLogBody({
     super.key,
@@ -34,7 +32,6 @@ class WorkoutLogBody extends StatefulWidget {
     required this.onDeleteWorkout,
     this.showOnlyHeader = false,
     this.sheetController,
-    this.showAsAppBar = false,
   });
 
   @override
@@ -65,7 +62,6 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
           onDeleteWorkout: widget.onDeleteWorkout,
           showOnlyHeader: widget.showOnlyHeader,
           sheetController: widget.sheetController,
-          showAsAppBar: widget.showAsAppBar,
         ),
         if (!widget.showOnlyHeader) const SizedBox(height: 80),
       ],
@@ -119,7 +115,6 @@ class WorkoutLogSection extends StatefulWidget {
     required this.onDeleteWorkout,
     this.showOnlyHeader = false,
     this.sheetController,
-    this.showAsAppBar = false,
   });
 
   @override
@@ -138,20 +133,14 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final useBar = widget.showAsAppBar;
     return Container(
-      color: useBar
-          ? Theme.of(context).colorScheme.primary
-          : isDark
-              ? Colors.grey[900]
-              : Colors.grey[50],
+      color: isDark ? Colors.grey[900] : Colors.grey[50],
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (useBar) SizedBox(height: MediaQuery.of(context).padding.top),
           Padding(
-            padding: EdgeInsets.symmetric(vertical: useBar ? 12 : 20),
+            padding: const EdgeInsets.symmetric(vertical: 20),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -159,23 +148,14 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                   children: [
                     Icon(
                       Icons.fitness_center,
-                      color: useBar
-                          ? Colors.white
-                          : Theme.of(context).colorScheme.primary,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                     const SizedBox(width: 8),
                     Text(
                       widget.selectedDay != null
                           ? '${widget.selectedDay!.month}월 ${widget.selectedDay!.day}일 운동 기록'
                           : '오늘의 운동 기록',
-                      style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            color: useBar
-                                ? Colors.white
-                                : Theme.of(context)
-                                    .textTheme
-                                    .titleLarge
-                                    ?.color,
-                          ),
+                      style: Theme.of(context).textTheme.titleLarge,
                     ),
                   ],
                 ),
@@ -184,16 +164,11 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                     ElevatedButton(
                       onPressed: widget.onAddWorkout,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: useBar
-                            ? Colors.white
-                            : Theme.of(context).colorScheme.primary,
+                        backgroundColor: Theme.of(context).colorScheme.primary,
                       ),
                       child: Text(
                         '운동 기록 추가',
-                        style: TextStyle(
-                            color: useBar
-                                ? Theme.of(context).colorScheme.primary
-                                : Colors.white),
+                        style: TextStyle(color: Colors.white),
                       ),
                     ),
                   ],

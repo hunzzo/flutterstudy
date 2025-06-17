@@ -11,13 +11,11 @@ import '../utils/workout_log_utils.dart';
 class WorkoutLogSheet extends StatefulWidget {
   final DateTime? selectedDay;
   final DraggableScrollableController controller;
-  final bool expanded;
 
   const WorkoutLogSheet({
     super.key,
     required this.selectedDay,
     required this.controller,
-    this.expanded = false,
   });
 
   @override
@@ -59,8 +57,8 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       controller: widget.controller,
-      minChildSize: 0.05,
-      initialChildSize: 0.05,
+      minChildSize: 0.1,
+      initialChildSize: 0.1,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return Container(
@@ -82,7 +80,6 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
                   controller: scrollController,
                   showOnlyHeader: !_expanded,
                   sheetController: widget.controller,
-                  showAsAppBar: widget.expanded,
                 ),
               ),
             ],

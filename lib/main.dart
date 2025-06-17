@@ -5,7 +5,6 @@ import 'pages/workout_home_page.dart';
 import 'providers/workout_data.dart';
 import 'providers/theme_provider.dart';
 import 'providers/exercise_presets.dart';
-import 'providers/order_provider.dart';
 import 'theme/app_theme.dart';
 
 void main() {
@@ -23,7 +22,6 @@ class WorkoutApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => WorkoutData()),
         ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => ExercisePresets()),
-        ChangeNotifierProvider(create: (_) => OrderProvider()),
       ],
       child: Consumer<ThemeProvider>(
         builder: (context, themeProvider, _) {

@@ -5,7 +5,6 @@ import '../simple_line_chart.dart';
 
 import '../../providers/exercise_presets.dart';
 import '../../providers/workout_data.dart';
-import '../../providers/order_provider.dart';
 
 class FavoriteProgressSection extends StatelessWidget {
   final VoidCallback? onScrollDown;
@@ -16,19 +15,9 @@ class FavoriteProgressSection extends StatelessWidget {
   Widget build(BuildContext context) {
     final presets = Provider.of<ExercisePresets>(context);
     final data = Provider.of<WorkoutData>(context);
-    final order = Provider.of<OrderProvider>(context);
     final favorites = presets.presets
         .where((p) => presets.isFavorite(p))
         .toList();
-    favorites.sort((a, b) {
-      final list = order.favoriteOrder;
-      final ia = list.indexOf(a);
-      final ib = list.indexOf(b);
-      if (ia == -1 && ib == -1) return 0;
-      if (ia == -1) return 1;
-      if (ib == -1) return -1;
-      return ia.compareTo(ib);
-    });
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -61,16 +50,10 @@ class FavoriteProgressSection extends StatelessWidget {
                 }
                 return false;
               },
-              child: ReorderableListView(
-                onReorder: (oldIndex, newIndex) =>
-                    order.reorderFavoriteList(favorites, oldIndex, newIndex),
-                children: [
-                  for (final e in favorites)
-                    Container(
-                      key: ValueKey(e),
-                      child: _buildItem(context, e, data),
-                    )
-                ],
+              child: ListView(
+                children: favorites
+                    .map((e) => _buildItem(context, e, data))
+                    .toList(),
               ),
             ),
           ),
@@ -133,9 +116,11 @@ class FavoriteProgressSection extends StatelessWidget {
       for (final r in records) {
         if (r.exercise == exercise) {
           double? w;
-          final doneSets = r.setDetails.where((s) => s.done).toList();
-          if (doneSets.isNotEmpty) {
-            w = doneSets.first.weight;
+          if (r.setDetails.isNotEmpty) {
+            w = r.setDetails.first.weight;
+          } else {
+            final m = RegExp(r'(\d+(?:\.\d+)?)kg').firstMatch(r.details);
+            if (m != null) w = double.tryParse(m.group(1)!);
           }
           if (w != null) {
             list.add(MapEntry(date, w));
@@ -155,9 +140,11 @@ class FavoriteProgressSection extends StatelessWidget {
       for (final r in records) {
         if (r.exercise == exercise) {
           double? w;
-          final doneSets = r.setDetails.where((s) => s.done).toList();
-          if (doneSets.isNotEmpty) {
-            w = doneSets.first.weight;
+          if (r.setDetails.isNotEmpty) {
+            w = r.setDetails.first.weight;
+          } else {
+            final m = RegExp(r'(\d+(?:\.\d+)?)kg').firstMatch(r.details);
+            if (m != null) w = double.tryParse(m.group(1)!);
           }
           if (w != null) {
             list.add(MapEntry(date, w));
