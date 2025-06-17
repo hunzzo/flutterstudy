@@ -239,7 +239,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                       fontWeight: FontWeight.bold,
                     ),
                   ),
-                  subtitle: Text('${workout.sets} | ${workout.details}'),
+                  subtitle: Text(workout.maxVolumeSummary),
                   trailing: Row(
                     mainAxisSize: MainAxisSize.min,
                     children: [

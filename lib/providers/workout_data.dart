@@ -12,32 +12,7 @@ class WorkoutData extends ChangeNotifier {
     return DateTime(now.year, now.month, now.day);
   }
 
-  final Map<DateTime, List<WorkoutRecord>> _workoutData = {
-    _day(0): [
-      WorkoutRecord('Bench Press', '3 sets', '80kg x 10', MuscleGroup.chest,
-          IntensityLevel.medium),
-      WorkoutRecord('Squat', '4 sets', '100kg x 8', MuscleGroup.legs,
-          IntensityLevel.high),
-      WorkoutRecord('Deadlift', '3 sets', '120kg x 5', MuscleGroup.back,
-          IntensityLevel.high),
-    ],
-    _day(-1): [
-      WorkoutRecord('Pull Up', '3 sets', 'Bodyweight x 12', MuscleGroup.back,
-          IntensityLevel.low),
-      WorkoutRecord('Dip', '3 sets', 'Bodyweight x 15', MuscleGroup.chest,
-          IntensityLevel.low),
-      WorkoutRecord('Shoulder Press', '4 sets', '40kg x 12',
-          MuscleGroup.shoulders, IntensityLevel.medium),
-    ],
-    _day(-2): [
-      WorkoutRecord('Bicep Curl', '3 sets', '15kg x 15', MuscleGroup.arms,
-          IntensityLevel.low),
-      WorkoutRecord('Tricep Dip', '3 sets', 'Bodyweight x 12', MuscleGroup.arms,
-          IntensityLevel.low),
-      WorkoutRecord('Leg Press', '4 sets', '150kg x 12', MuscleGroup.legs,
-          IntensityLevel.medium),
-    ],
-  };
+  final Map<DateTime, List<WorkoutRecord>> _workoutData = {};
 
   WorkoutData() {
     _loadData();
