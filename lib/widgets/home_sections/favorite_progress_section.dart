@@ -86,7 +86,7 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
                         notification.metrics.maxScrollExtent &&
                     notification is OverscrollNotification &&
                     notification.overscroll > 0) {
-                  onScrollDown?.call();
+                  widget.onScrollDown?.call();
                 }
                 return false;
               },

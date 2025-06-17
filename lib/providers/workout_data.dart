@@ -7,11 +7,6 @@ import '../models/workout.dart';
 class WorkoutData extends ChangeNotifier {
   static const String _storageKey = 'workoutData';
 
-  static DateTime _day(int offset) {
-    final now = DateTime.now().add(Duration(days: offset));
-    return DateTime(now.year, now.month, now.day);
-  }
-
   final Map<DateTime, List<WorkoutRecord>> _workoutData = {};
 
   WorkoutData() {
