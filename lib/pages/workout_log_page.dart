@@ -7,7 +7,7 @@ import 'dart:async';
 // 운동 데이터 제공자
 import '../providers/workout_data.dart';
 import '../models/workout.dart';
-import '../widgets/editable_number.dart';
+//import '../widgets/editable_number.dart';
 // 공통 동작을 모아둔 유틸 함수
 import '../utils/workout_log_utils.dart';
 
@@ -269,10 +269,7 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
                           Provider.of<WorkoutData>(
                             context,
                             listen: false,
-                          ).addSet(
-                            widget.selectedDay ?? DateTime.now(),
-                            index,
-                          );
+                          ).addSet(widget.selectedDay ?? DateTime.now(), index);
                         },
                       ),
                       IconButton(
@@ -343,7 +340,9 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
 
   void _editIntensity(BuildContext context, int workoutIndex) {
     final provider = Provider.of<WorkoutData>(context, listen: false);
-    final workouts = provider.workoutsForDay(widget.selectedDay ?? DateTime.now());
+    final workouts = provider.workoutsForDay(
+      widget.selectedDay ?? DateTime.now(),
+    );
     final current = workouts[workoutIndex].intensity;
     int selectedIndex = IntensityLevel.values.indexOf(current);
     showModalBottomSheet(
@@ -355,7 +354,9 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
             children: [
               Expanded(
                 child: CupertinoPicker(
-                  scrollController: FixedExtentScrollController(initialItem: selectedIndex),
+                  scrollController: FixedExtentScrollController(
+                    initialItem: selectedIndex,
+                  ),
                   itemExtent: 32,
                   onSelectedItemChanged: (i) => selectedIndex = i,
                   children: IntensityLevel.values
@@ -366,13 +367,14 @@ class _WorkoutLogSectionState extends State<WorkoutLogSection> {
               TextButton(
                 onPressed: () {
                   provider.updateIntensity(
-                      widget.selectedDay ?? DateTime.now(),
-                      workoutIndex,
-                      IntensityLevel.values[selectedIndex]);
+                    widget.selectedDay ?? DateTime.now(),
+                    workoutIndex,
+                    IntensityLevel.values[selectedIndex],
+                  );
                   Navigator.pop(context);
                 },
                 child: const Text('확인'),
-              )
+              ),
             ],
           ),
         );
@@ -508,58 +510,80 @@ class _SetRowState extends State<_SetRow> {
           child: InkWell(
             onTap: () {
               provider.toggleSetDone(
-                  widget.day, widget.workoutIndex, widget.setIndex);
+                widget.day,
+                widget.workoutIndex,
+                widget.setIndex,
+              );
               widget.onToggle();
             },
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('${set.weight.toStringAsFixed(1)}kg x ${set.reps}'),
-                  IconButton(
-                    icon: Icon(
-                        _expanded ? Icons.expand_less : Icons.expand_more),
-                    onPressed: () => setState(() => _expanded = !_expanded),
-                  ),
-                ],
-              ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text('${set.weight.toStringAsFixed(1)}kg x ${set.reps}'),
+                IconButton(
+                  icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more),
+                  onPressed: () => setState(() => _expanded = !_expanded),
+                ),
+              ],
             ),
           ),
         ),
         if (_expanded)
           Container(
             color: Theme.of(context).colorScheme.surfaceVariant,
-            padding: const EdgeInsets.symmetric(vertical: 4),
+            padding: const EdgeInsets.symmetric(vertical: 0),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => provider.updateSet(
-                      widget.day, widget.workoutIndex, widget.setIndex,
-                      weight: set.weight - 2.5),
+                Row(
+                  //mainAxisAlignment: MainAxisAlignment.start,
+                  children: [
+                    const SizedBox(width: 16),
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: () => provider.updateSet(
+                        widget.day,
+                        widget.workoutIndex,
+                        widget.setIndex,
+                        weight: set.weight - 2.5,
+                      ),
+                    ),
+                    Text('${set.weight.toStringAsFixed(1)}kg'),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => provider.updateSet(
+                        widget.day,
+                        widget.workoutIndex,
+                        widget.setIndex,
+                        weight: set.weight + 2.5,
+                      ),
+                    ),
+                  ],
                 ),
-                Text('${set.weight.toStringAsFixed(1)}kg'),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => provider.updateSet(
-                      widget.day, widget.workoutIndex, widget.setIndex,
-                      weight: set.weight + 2.5),
-                ),
-                const SizedBox(width: 16),
-                IconButton(
-                  icon: const Icon(Icons.remove),
-                  onPressed: () => provider.updateSet(
-                      widget.day, widget.workoutIndex, widget.setIndex,
-                      reps: set.reps - 1),
-                ),
-                Text('${set.reps}회'),
-                IconButton(
-                  icon: const Icon(Icons.add),
-                  onPressed: () => provider.updateSet(
-                      widget.day, widget.workoutIndex, widget.setIndex,
-                      reps: set.reps + 1),
+                Row(
+                  //mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.remove),
+                      onPressed: () => provider.updateSet(
+                        widget.day,
+                        widget.workoutIndex,
+                        widget.setIndex,
+                        reps: set.reps - 1,
+                      ),
+                    ),
+                    Text('${set.reps}회'),
+                    IconButton(
+                      icon: const Icon(Icons.add),
+                      onPressed: () => provider.updateSet(
+                        widget.day,
+                        widget.workoutIndex,
+                        widget.setIndex,
+                        reps: set.reps + 1,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                  ],
                 ),
               ],
             ),
