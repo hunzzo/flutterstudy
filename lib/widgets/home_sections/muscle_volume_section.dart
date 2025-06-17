@@ -1,12 +1,42 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../models/workout.dart';
 import '../../providers/workout_data.dart';
 import '../simple_line_chart.dart';
 
-class MuscleVolumeSection extends StatelessWidget {
+class MuscleVolumeSection extends StatefulWidget {
   const MuscleVolumeSection({super.key});
+
+  @override
+  State<MuscleVolumeSection> createState() => _MuscleVolumeSectionState();
+}
+
+class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
+  List<MuscleGroup> _order = MuscleGroup.values.toList();
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrder();
+  }
+
+  Future<void> _loadOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getStringList('muscleVolumeOrder');
+    if (saved != null && saved.length == MuscleGroup.values.length) {
+      setState(() {
+        _order = saved.map(MuscleGroupExtension.fromName).toList();
+      });
+    }
+  }
+
+  Future<void> _saveOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList(
+        'muscleVolumeOrder', _order.map((e) => e.name).toList());
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,10 +62,23 @@ class MuscleVolumeSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ListView(
-              children: MuscleGroup.values
-                  .map((g) => _buildItem(context, g, data))
-                  .toList(),
+            child: ReorderableListView(
+              onReorder: (oldIndex, newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = _order.removeAt(oldIndex);
+                  _order.insert(newIndex, item);
+                });
+                _saveOrder();
+              },
+              children: [
+                for (final g in _order)
+                  Padding(
+                    key: ValueKey(g.name),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _buildItem(context, g, data),
+                  ),
+              ],
             ),
           ),
         ],
@@ -104,7 +147,7 @@ class MuscleVolumeSection extends StatelessWidget {
       double volume = 0;
       for (final r in records) {
         if (r.muscleGroup == group) {
-          for (final s in r.setDetails) {
+          for (final s in r.setDetails.where((e) => e.done)) {
             volume += s.weight * s.reps;
           }
         }

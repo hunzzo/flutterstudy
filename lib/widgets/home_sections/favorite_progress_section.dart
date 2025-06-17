@@ -1,15 +1,45 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:flutter/foundation.dart';
 
 import '../simple_line_chart.dart';
 
 import '../../providers/exercise_presets.dart';
 import '../../providers/workout_data.dart';
 
-class FavoriteProgressSection extends StatelessWidget {
+class FavoriteProgressSection extends StatefulWidget {
   final VoidCallback? onScrollDown;
 
   const FavoriteProgressSection({super.key, this.onScrollDown});
+
+  @override
+  State<FavoriteProgressSection> createState() => _FavoriteProgressSectionState();
+}
+
+class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
+  List<String> _order = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrder();
+  }
+
+  Future<void> _loadOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getStringList('favoriteProgressOrder');
+    if (saved != null) {
+      setState(() {
+        _order = saved;
+      });
+    }
+  }
+
+  Future<void> _saveOrder() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setStringList('favoriteProgressOrder', _order);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -18,6 +48,16 @@ class FavoriteProgressSection extends StatelessWidget {
     final favorites = presets.presets
         .where((p) => presets.isFavorite(p))
         .toList();
+
+    // Ensure local order list matches current favorites
+    List<String> ordered = _order.where(favorites.contains).toList();
+    for (final f in favorites) {
+      if (!ordered.contains(f)) ordered.add(f);
+    }
+    if (!listEquals(ordered, _order)) {
+      _order = ordered;
+      _saveOrder();
+    }
 
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
@@ -50,10 +90,23 @@ class FavoriteProgressSection extends StatelessWidget {
                 }
                 return false;
               },
-              child: ListView(
-                children: favorites
-                    .map((e) => _buildItem(context, e, data))
-                    .toList(),
+              child: ReorderableListView(
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = _order.removeAt(oldIndex);
+                    _order.insert(newIndex, item);
+                  });
+                  _saveOrder();
+                },
+                children: [
+                  for (final ex in _order)
+                    Padding(
+                      key: ValueKey(ex),
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: _buildItem(context, ex, data),
+                    ),
+                ],
               ),
             ),
           ),
@@ -117,10 +170,13 @@ class FavoriteProgressSection extends StatelessWidget {
         if (r.exercise == exercise) {
           double? w;
           if (r.setDetails.isNotEmpty) {
-            w = r.setDetails.first.weight;
-          } else {
-            final m = RegExp(r'(\d+(?:\.\d+)?)kg').firstMatch(r.details);
-            if (m != null) w = double.tryParse(m.group(1)!);
+            final doneSet = r.setDetails.firstWhere(
+              (s) => s.done,
+              orElse: () => r.setDetails.first,
+            );
+            if (doneSet.done) {
+              w = doneSet.weight;
+            }
           }
           if (w != null) {
             list.add(MapEntry(date, w));
@@ -141,10 +197,13 @@ class FavoriteProgressSection extends StatelessWidget {
         if (r.exercise == exercise) {
           double? w;
           if (r.setDetails.isNotEmpty) {
-            w = r.setDetails.first.weight;
-          } else {
-            final m = RegExp(r'(\d+(?:\.\d+)?)kg').firstMatch(r.details);
-            if (m != null) w = double.tryParse(m.group(1)!);
+            final doneSet = r.setDetails.firstWhere(
+              (s) => s.done,
+              orElse: () => r.setDetails.first,
+            );
+            if (doneSet.done) {
+              w = doneSet.weight;
+            }
           }
           if (w != null) {
             list.add(MapEntry(date, w));
