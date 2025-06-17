@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../models/workout.dart';
 import '../../providers/workout_data.dart';
+import '../../providers/order_provider.dart';
 import '../simple_line_chart.dart';
 
 class MuscleVolumeSection extends StatelessWidget {
@@ -11,6 +12,7 @@ class MuscleVolumeSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final data = Provider.of<WorkoutData>(context);
+    final order = Provider.of<OrderProvider>(context);
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Container(
@@ -32,10 +34,15 @@ class MuscleVolumeSection extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ListView(
-              children: MuscleGroup.values
-                  .map((g) => _buildItem(context, g, data))
-                  .toList(),
+            child: ReorderableListView(
+              onReorder: order.reorderMuscle,
+              children: [
+                for (final g in _orderedGroups(order))
+                  Container(
+                    key: ValueKey(g.name),
+                    child: _buildItem(context, g, data),
+                  )
+              ],
             ),
           ),
         ],
@@ -105,7 +112,9 @@ class MuscleVolumeSection extends StatelessWidget {
       for (final r in records) {
         if (r.muscleGroup == group) {
           for (final s in r.setDetails) {
-            volume += s.weight * s.reps;
+            if (s.done) {
+              volume += s.weight * s.reps;
+            }
           }
         }
       }
@@ -115,6 +124,20 @@ class MuscleVolumeSection extends StatelessWidget {
     });
     list.sort((a, b) => a.key.compareTo(b.key));
     return list;
+  }
+
+  List<MuscleGroup> _orderedGroups(OrderProvider order) {
+    final groups = MuscleGroup.values.toList();
+    groups.sort((a, b) {
+      final list = order.muscleOrder;
+      final ia = list.indexOf(a.name);
+      final ib = list.indexOf(b.name);
+      if (ia == -1 && ib == -1) return 0;
+      if (ia == -1) return 1;
+      if (ib == -1) return -1;
+      return ia.compareTo(ib);
+    });
+    return groups;
   }
 
   String _groupName(MuscleGroup g) {
