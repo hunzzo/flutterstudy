@@ -69,26 +69,6 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
           ),
           child: Column(
             children: [
-              GestureDetector(
-                onTap: () => widget.controller.animateTo(
-                  1.0,
-                  duration: const Duration(milliseconds: 300),
-                  curve: Curves.easeOut,
-                ),
-                child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Center(
-                    child: Container(
-                      width: 40,
-                      height: 4,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(2),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
               // Reuse the same body widget as the full page.
               Expanded(
                 child: WorkoutLogBody(
