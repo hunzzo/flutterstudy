@@ -41,13 +41,15 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: _hideAppBar
-          ? null
-          : AppBar(
+      body: NestedScrollView(
+        headerSliverBuilder: (context, innerBoxIsScrolled) {
+          if (_hideAppBar) return [];
+          return [
+            SliverAppBar(
               title: const Text('운동 기록'),
-
               backgroundColor: Theme.of(context).colorScheme.primary,
               elevation: 0,
+              pinned: true,
               actions: [
                 PopupMenuButton<String>(
                   onSelected: (value) {
@@ -65,16 +67,17 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                       child: Text('설정'),
                     ),
                   ],
-
                 ),
               ],
             ),
-      body: PageView(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
+          ];
+        },
+        body: PageView(
+          controller: _pageController,
+          scrollDirection: Axis.vertical,
+          onPageChanged: (index) {
+            setState(() {
+              _currentPage = index;
           });
         },
         children: [
