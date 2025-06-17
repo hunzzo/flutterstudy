@@ -58,7 +58,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
     return DraggableScrollableSheet(
       controller: widget.controller,
       minChildSize: 0.1,
-      initialChildSize: 0.15,
+      initialChildSize: 0.1,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return Container(
@@ -93,8 +93,8 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
               Expanded(
                 child: WorkoutLogBody(
                   selectedDay: widget.selectedDay,
-                  onAddWorkout: () => openAddWorkoutPage(
-                      context, widget.selectedDay!),
+                  onAddWorkout: () =>
+                      openAddWorkoutPage(context, widget.selectedDay!),
                   onDeleteWorkout: (i) =>
                       deleteWorkout(context, widget.selectedDay!, i),
                   controller: scrollController,
