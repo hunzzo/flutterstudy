@@ -551,7 +551,7 @@ class _SetRowState extends State<_SetRow> {
         Material(
           color: set.done
               ? Theme.of(context).colorScheme.primary
-              : Theme.of(context).colorScheme.surfaceVariant,
+              : Theme.of(context).colorScheme.surfaceContainerHighest,
           child: InkWell(
             onTap: () {
               provider.toggleSetDone(
@@ -575,7 +575,7 @@ class _SetRowState extends State<_SetRow> {
         ),
         if (_expanded)
           Container(
-            color: Theme.of(context).colorScheme.surfaceVariant,
+            color: Theme.of(context).colorScheme.surfaceContainerHighest,
             padding: const EdgeInsets.symmetric(vertical: 0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
