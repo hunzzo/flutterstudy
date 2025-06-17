@@ -53,17 +53,38 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
+    if (widget.showOnlyHeader) {
+      return ListView(
+        controller: widget.controller,
+        children: [
+          WorkoutLogSection(
+            selectedDay: widget.selectedDay,
+            onAddWorkout: widget.onAddWorkout,
+            onDeleteWorkout: widget.onDeleteWorkout,
+            showOnlyHeader: true,
+            sheetController: widget.sheetController,
+          ),
+        ],
+      );
+    }
+
+    return CustomScrollView(
       controller: widget.controller,
-      children: [
-        WorkoutLogSection(
-          selectedDay: widget.selectedDay,
-          onAddWorkout: widget.onAddWorkout,
-          onDeleteWorkout: widget.onDeleteWorkout,
-          showOnlyHeader: widget.showOnlyHeader,
-          sheetController: widget.sheetController,
+      slivers: [
+        const SliverAppBar(
+          title: Text('오늘의 운동'),
+          pinned: true,
         ),
-        if (!widget.showOnlyHeader) const SizedBox(height: 80),
+        SliverToBoxAdapter(
+          child: WorkoutLogSection(
+            selectedDay: widget.selectedDay,
+            onAddWorkout: widget.onAddWorkout,
+            onDeleteWorkout: widget.onDeleteWorkout,
+            showOnlyHeader: false,
+            sheetController: widget.sheetController,
+          ),
+        ),
+        const SliverToBoxAdapter(child: SizedBox(height: 80)),
       ],
     );
   }
@@ -83,8 +104,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('오늘의 운동')),
-      // Reusable body shared with [WorkoutLogSheet].
+      // Reusable body shared with [WorkoutLogSheet]. Includes sliver app bar.
       body: WorkoutLogBody(
         selectedDay: widget.selectedDay,
         onAddWorkout: () => openAddWorkoutPage(context, widget.selectedDay!),
