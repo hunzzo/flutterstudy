@@ -57,7 +57,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
   Widget build(BuildContext context) {
     return DraggableScrollableSheet(
       controller: widget.controller,
-      minChildSize: 0.0,
+      minChildSize: 0.1,
       initialChildSize: 0.1,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
