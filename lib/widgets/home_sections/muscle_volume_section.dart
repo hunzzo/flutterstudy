@@ -7,7 +7,8 @@ import '../../providers/workout_data.dart';
 import '../simple_line_chart.dart';
 
 class MuscleVolumeSection extends StatefulWidget {
-  const MuscleVolumeSection({super.key});
+  final VoidCallback? onScrollDown;
+  const MuscleVolumeSection({super.key, this.onScrollDown});
 
   @override
   State<MuscleVolumeSection> createState() => _MuscleVolumeSectionState();
@@ -62,23 +63,34 @@ class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
-                setState(() {
-                  if (newIndex > oldIndex) newIndex -= 1;
-                  final item = _order.removeAt(oldIndex);
-                  _order.insert(newIndex, item);
-                });
-                _saveOrder();
+            child: NotificationListener<ScrollNotification>(
+              onNotification: (notification) {
+                if (notification.metrics.pixels >=
+                        notification.metrics.maxScrollExtent &&
+                    notification is OverscrollNotification &&
+                    notification.overscroll > 0) {
+                  widget.onScrollDown?.call();
+                }
+                return false;
               },
-              children: [
-                for (final g in _order)
-                  Padding(
-                    key: ValueKey(g.name),
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _buildItem(context, g, data),
-                  ),
-              ],
+              child: ReorderableListView(
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = _order.removeAt(oldIndex);
+                    _order.insert(newIndex, item);
+                  });
+                  _saveOrder();
+                },
+                children: [
+                  for (final g in _order)
+                    Padding(
+                      key: ValueKey(g.name),
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: _buildItem(context, g, data),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

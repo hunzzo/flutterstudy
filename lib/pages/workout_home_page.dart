@@ -4,7 +4,6 @@ import 'package:table_calendar/table_calendar.dart';
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/favorite_progress_section.dart';
-//import '../widgets/home_sections/muscle_recovery_section.dart';
 import '../widgets/home_sections/muscle_volume_section.dart';
 import 'settings_page.dart';
 
@@ -76,6 +75,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               child: PageView(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
+                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
@@ -83,11 +83,24 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                 },
                 children: [
                   PageView(
-                    //controller: _pageController,
                     scrollDirection: Axis.horizontal,
                     children: [
-                      MuscleVolumeSection(),
-                      FavoriteProgressSection(),
+                      MuscleVolumeSection(
+                        onScrollDown: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                      ),
+                      FavoriteProgressSection(
+                        onScrollDown: () {
+                          _pageController.nextPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
+                      ),
                     ],
                   ),
                   Stack(
@@ -167,12 +180,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     _scrollController.jumpTo(combined);
   }
 
-  void _goToCalendar() {
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
 
   @override
   void dispose() {
