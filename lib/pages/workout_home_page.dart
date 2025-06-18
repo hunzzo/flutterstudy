@@ -75,7 +75,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               child: PageView(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
-                physics: const NeverScrollableScrollPhysics(),
                 onPageChanged: (index) {
                   setState(() {
                     _currentPage = index;
@@ -84,23 +83,9 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                 children: [
                   PageView(
                     scrollDirection: Axis.horizontal,
-                    children: [
-                      MuscleVolumeSection(
-                        onScrollDown: () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                      ),
-                      FavoriteProgressSection(
-                        onScrollDown: () {
-                          _pageController.nextPage(
-                            duration: const Duration(milliseconds: 300),
-                            curve: Curves.easeInOut,
-                          );
-                        },
-                      ),
+                    children: const [
+                      MuscleVolumeSection(),
+                      FavoriteProgressSection(),
                     ],
                   ),
                   Stack(
