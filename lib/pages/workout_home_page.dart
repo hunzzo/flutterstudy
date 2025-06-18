@@ -3,7 +3,9 @@ import 'package:table_calendar/table_calendar.dart';
 
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
-import '../widgets/home_sections/muscle_recovery_section.dart';
+import '../widgets/home_sections/favorite_progress_section.dart';
+//import '../widgets/home_sections/muscle_recovery_section.dart';
+import '../widgets/home_sections/muscle_volume_section.dart';
 import 'settings_page.dart';
 
 import '../widgets/workout_log_sheet.dart';
@@ -33,9 +35,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
-    _pageController = PageController(
-      initialPage: _currentPage,
-    );
+    _pageController = PageController(initialPage: _currentPage);
     _sheetController = DraggableScrollableController();
     _scrollController = ScrollController();
     _sheetController.addListener(_handleSheetDrag);
@@ -53,7 +53,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
           physics: const NeverScrollableScrollPhysics(),
           slivers: [
             SliverAppBar(
-              pinned: true,
+              pinned: false,
               title: const Text('운동 기록'),
               backgroundColor: Theme.of(context).colorScheme.primary,
               elevation: 0,
@@ -67,12 +67,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                     }
                   },
                   itemBuilder: (context) => const [
-                    PopupMenuItem(
-                      value: 'settings',
-                      child: Text('설정'),
-                    ),
+                    PopupMenuItem(value: 'settings', child: Text('설정')),
                   ],
-
                 ),
               ],
             ),
@@ -86,8 +82,13 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                   });
                 },
                 children: [
-                  MuscleRecoverySection(
-                    onScrollDownFromFavorites: _goToCalendar,
+                  PageView(
+                    //controller: _pageController,
+                    scrollDirection: Axis.horizontal,
+                    children: [
+                      MuscleVolumeSection(),
+                      FavoriteProgressSection(),
+                    ],
                   ),
                   Stack(
                     children: [
@@ -134,6 +135,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       ),
     );
   }
+
   // 달력을 좌우로 넘길 때 사용되는 드래그 핸들러
   void _handleCalendarHorizontalDrag(DragEndDetails details) {
     if (details.primaryVelocity == null) return;
