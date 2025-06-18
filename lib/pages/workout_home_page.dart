@@ -76,7 +76,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               ],
             ),
             SliverFillRemaining(
-              hasScrollBody: false,
               child: PageView(
                 controller: _pageController,
                 scrollDirection: Axis.vertical,
