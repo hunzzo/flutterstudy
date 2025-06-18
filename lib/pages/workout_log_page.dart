@@ -23,6 +23,7 @@ class WorkoutLogBody extends StatefulWidget {
   final void Function(int) onDeleteWorkout;
   final bool showOnlyHeader;
   final DraggableScrollableController? sheetController;
+  final void Function(double)? onScroll;
 
   const WorkoutLogBody({
     super.key,
@@ -32,6 +33,7 @@ class WorkoutLogBody extends StatefulWidget {
     required this.onDeleteWorkout,
     this.showOnlyHeader = false,
     this.sheetController,
+    this.onScroll,
   });
 
   @override
@@ -41,14 +43,36 @@ class WorkoutLogBody extends StatefulWidget {
 // WorkoutLogBody의 상태 클래스
 class _WorkoutLogBodyState extends State<WorkoutLogBody> {
   @override
+  void initState() {
+    super.initState();
+    widget.controller?.addListener(_onScroll);
+  }
+
+  void _onScroll() {
+    if (widget.onScroll != null && widget.controller != null) {
+      widget.onScroll!(widget.controller!.offset);
+    }
+  }
+
+  @override
   void didUpdateWidget(covariant WorkoutLogBody oldWidget) {
     super.didUpdateWidget(oldWidget);
+    if (oldWidget.controller != widget.controller) {
+      oldWidget.controller?.removeListener(_onScroll);
+      widget.controller?.addListener(_onScroll);
+    }
     if (!isSameDay(oldWidget.selectedDay, widget.selectedDay)) {
       final controller = widget.controller;
       if (controller != null && controller.hasClients) {
         controller.jumpTo(controller.position.minScrollExtent);
       }
     }
+  }
+
+  @override
+  void dispose() {
+    widget.controller?.removeListener(_onScroll);
+    super.dispose();
   }
 
   @override

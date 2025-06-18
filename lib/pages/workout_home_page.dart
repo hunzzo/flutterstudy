@@ -26,6 +26,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   late DraggableScrollableController _sheetController;
   // 슬리버 앱바 제어용 스크롤 컨트롤러
   late ScrollController _scrollController;
+  double _logScrollOffset = 0;
   int _currentPage = 1;
 
   @override
@@ -121,6 +122,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                       WorkoutLogSheet(
                         selectedDay: _selectedDay,
                         controller: _sheetController,
+                        onScroll: _handleLogScroll,
                       ),
                     ],
                   ),
@@ -148,10 +150,19 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
 
   // 드래그 시트 크기에 맞춰 앱바를 숨기기 위한 핸들러
   void _handleSheetDrag() {
+    _updateAppBarOffset();
+  }
+
+  void _handleLogScroll(double offset) {
+    _logScrollOffset = offset.clamp(0.0, kToolbarHeight);
+    _updateAppBarOffset();
+  }
+
+  void _updateAppBarOffset() {
     if (!_scrollController.hasClients) return;
-    final offset =
-        (_sheetController.size.clamp(0.0, 1.0)) * kToolbarHeight;
-    _scrollController.jumpTo(offset);
+    final baseOffset = (_sheetController.size.clamp(0.0, 1.0)) * kToolbarHeight;
+    final combined = (baseOffset + _logScrollOffset).clamp(0.0, kToolbarHeight);
+    _scrollController.jumpTo(combined);
   }
 
   void _goToCalendar() {
