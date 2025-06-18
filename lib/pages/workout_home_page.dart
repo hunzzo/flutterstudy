@@ -24,6 +24,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   late PageController _pageController;
   // 운동 기록 시트 제어용 컨트롤러
   late DraggableScrollableController _sheetController;
+  // 슬리버 앱바 제어용 스크롤 컨트롤러
+  late ScrollController _scrollController;
   int _currentPage = 1;
 
   @override
@@ -34,84 +36,100 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
       initialPage: _currentPage,
     );
     _sheetController = DraggableScrollableController();
+    _scrollController = ScrollController();
+    _sheetController.addListener(_handleSheetDrag);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('운동 기록'),
-
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        elevation: 0,
-        actions: [
-          PopupMenuButton<String>(
-            onSelected: (value) {
-              if (value == 'settings') {
-                Navigator.of(context).push(
-                  MaterialPageRoute(builder: (_) => const SettingsPage()),
-                );
-              }
-            },
-            itemBuilder: (context) => const [
-              PopupMenuItem(
-                value: 'settings',
-                child: Text('설정'),
-              ),
-            ],
-
-          ),
-        ],
-      ),
-      body: PageView(
-        controller: _pageController,
-        scrollDirection: Axis.vertical,
-        onPageChanged: (index) {
-          setState(() {
-            _currentPage = index;
-          });
-        },
-        children: [
-          MuscleRecoverySection(
-            onScrollDownFromFavorites: _goToCalendar,
-          ),
-          Stack(
-            children: [
-              GestureDetector(
-                behavior: HitTestBehavior.translucent,
-                onHorizontalDragEnd: _handleCalendarHorizontalDrag,
-                child: CalendarSection(
-                  calendarFormat: _calendarFormat,
-                  focusedDay: _focusedDay,
-                  selectedDay: _selectedDay,
-                  onFormatChanged: (format) {
-                    setState(() => _calendarFormat = format);
-                  },
-                  onDaySelected: (selectedDay, focusedDay) {
-                    if (!isSameDay(_selectedDay, selectedDay)) {
-                      setState(() {
-                        _selectedDay = selectedDay;
-                        _focusedDay = focusedDay;
-                      });
+      body: SafeArea(
+        top: true,
+        bottom: false,
+        minimum: const EdgeInsets.only(top: 48),
+        child: CustomScrollView(
+          controller: _scrollController,
+          physics: const NeverScrollableScrollPhysics(),
+          slivers: [
+            SliverAppBar(
+              pinned: true,
+              title: const Text('운동 기록'),
+              backgroundColor: Theme.of(context).colorScheme.primary,
+              elevation: 0,
+              actions: [
+                PopupMenuButton<String>(
+                  onSelected: (value) {
+                    if (value == 'settings') {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(builder: (_) => const SettingsPage()),
+                      );
                     }
-                    _sheetController.animateTo(
-                      1.0,
-                      duration: const Duration(milliseconds: 300),
-                      curve: Curves.easeInOut,
-                    );
                   },
-                  onPageChanged: (focusedDay) {
-                    _focusedDay = focusedDay;
-                  },
+                  itemBuilder: (context) => const [
+                    PopupMenuItem(
+                      value: 'settings',
+                      child: Text('설정'),
+                    ),
+                  ],
+
                 ),
+              ],
+            ),
+            SliverFillRemaining(
+              hasScrollBody: false,
+              child: PageView(
+                controller: _pageController,
+                scrollDirection: Axis.vertical,
+                onPageChanged: (index) {
+                  setState(() {
+                    _currentPage = index;
+                  });
+                },
+                children: [
+                  MuscleRecoverySection(
+                    onScrollDownFromFavorites: _goToCalendar,
+                  ),
+                  Stack(
+                    children: [
+                      GestureDetector(
+                        behavior: HitTestBehavior.translucent,
+                        onHorizontalDragEnd: _handleCalendarHorizontalDrag,
+                        child: CalendarSection(
+                          calendarFormat: _calendarFormat,
+                          focusedDay: _focusedDay,
+                          selectedDay: _selectedDay,
+                          onFormatChanged: (format) {
+                            setState(() => _calendarFormat = format);
+                          },
+                          onDaySelected: (selectedDay, focusedDay) {
+                            if (!isSameDay(_selectedDay, selectedDay)) {
+                              setState(() {
+                                _selectedDay = selectedDay;
+                                _focusedDay = focusedDay;
+                              });
+                            }
+                            _sheetController.animateTo(
+                              1.0,
+                              duration: const Duration(milliseconds: 300),
+                              curve: Curves.easeInOut,
+                            );
+                          },
+                          onPageChanged: (focusedDay) {
+                            _focusedDay = focusedDay;
+                          },
+                        ),
+                      ),
+                      WorkoutLogSheet(
+                        selectedDay: _selectedDay,
+                        controller: _sheetController,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-              WorkoutLogSheet(
-                selectedDay: _selectedDay,
-                controller: _sheetController,
-              ),
-            ],
-          ),
-        ],
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -129,6 +147,14 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     }
   }
 
+  // 드래그 시트 크기에 맞춰 앱바를 숨기기 위한 핸들러
+  void _handleSheetDrag() {
+    if (!_scrollController.hasClients) return;
+    final offset =
+        (_sheetController.size.clamp(0.0, 1.0)) * kToolbarHeight;
+    _scrollController.jumpTo(offset);
+  }
+
   void _goToCalendar() {
     _pageController.nextPage(
       duration: const Duration(milliseconds: 300),
@@ -138,7 +164,9 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
 
   @override
   void dispose() {
+    _sheetController.removeListener(_handleSheetDrag);
     _pageController.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 }
