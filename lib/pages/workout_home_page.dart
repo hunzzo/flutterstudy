@@ -137,6 +137,12 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                         selectedDay: _selectedDay,
                         controller: _sheetController,
                         onScroll: _handleLogScroll,
+                        onPullDown: () {
+                          _pageController.previousPage(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                          );
+                        },
                       ),
                     ],
                   ),

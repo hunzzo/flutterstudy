@@ -12,12 +12,14 @@ class WorkoutLogSheet extends StatefulWidget {
   final DateTime? selectedDay;
   final DraggableScrollableController controller;
   final void Function(double)? onScroll;
+  final VoidCallback? onPullDown;
 
   const WorkoutLogSheet({
     super.key,
     required this.selectedDay,
     required this.controller,
     this.onScroll,
+    this.onPullDown,
   });
 
   @override
@@ -63,29 +65,40 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
       initialChildSize: 0.1,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Theme.of(context).scaffoldBackgroundColor,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
-            boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
-          ),
-          child: Column(
-            children: [
-              // Reuse the same body widget as the full page.
-              Expanded(
-                child: WorkoutLogBody(
-                  selectedDay: widget.selectedDay,
-                  onAddWorkout: () =>
-                      openAddWorkoutPage(context, widget.selectedDay!),
-                  onDeleteWorkout: (i) =>
-                      deleteWorkout(context, widget.selectedDay!, i),
-                  controller: scrollController,
-                  showOnlyHeader: !_expanded,
-                  sheetController: widget.controller,
-                  onScroll: widget.onScroll,
+        return NotificationListener<ScrollNotification>(
+          onNotification: (notification) {
+            if (notification.metrics.pixels <=
+                    notification.metrics.minScrollExtent &&
+                notification is OverscrollNotification &&
+                notification.overscroll < 0) {
+              widget.onPullDown?.call();
+            }
+            return false;
+          },
+          child: Container(
+            decoration: BoxDecoration(
+              color: Theme.of(context).scaffoldBackgroundColor,
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+              boxShadow: const [BoxShadow(color: Colors.black26, blurRadius: 5)],
+            ),
+            child: Column(
+              children: [
+                // Reuse the same body widget as the full page.
+                Expanded(
+                  child: WorkoutLogBody(
+                    selectedDay: widget.selectedDay,
+                    onAddWorkout: () =>
+                        openAddWorkoutPage(context, widget.selectedDay!),
+                    onDeleteWorkout: (i) =>
+                        deleteWorkout(context, widget.selectedDay!, i),
+                    controller: scrollController,
+                    showOnlyHeader: !_expanded,
+                    sheetController: widget.controller,
+                    onScroll: widget.onScroll,
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
