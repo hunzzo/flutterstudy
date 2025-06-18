@@ -42,21 +42,10 @@ class WorkoutLogBody extends StatefulWidget {
 
 // WorkoutLogBody의 상태 클래스
 class _WorkoutLogBodyState extends State<WorkoutLogBody> {
-  double _sheetSize = 1.0;
-
   @override
   void initState() {
     super.initState();
     widget.controller?.addListener(_onScroll);
-    _sheetSize = widget.sheetController?.size ?? 1.0;
-    widget.sheetController?.addListener(_updateSheetSize);
-  }
-
-  void _updateSheetSize() {
-    final newSize = widget.sheetController?.size ?? 1.0;
-    if (newSize != _sheetSize) {
-      setState(() => _sheetSize = newSize);
-    }
   }
 
   void _onScroll() {
@@ -72,11 +61,6 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
       oldWidget.controller?.removeListener(_onScroll);
       widget.controller?.addListener(_onScroll);
     }
-    if (oldWidget.sheetController != widget.sheetController) {
-      oldWidget.sheetController?.removeListener(_updateSheetSize);
-      widget.sheetController?.addListener(_updateSheetSize);
-      _sheetSize = widget.sheetController?.size ?? 1.0;
-    }
     if (!isSameDay(oldWidget.selectedDay, widget.selectedDay)) {
       final controller = widget.controller;
       if (controller != null && controller.hasClients) {
@@ -88,64 +72,43 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
   @override
   void dispose() {
     widget.controller?.removeListener(_onScroll);
-    widget.sheetController?.removeListener(_updateSheetSize);
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final titleText = widget.selectedDay != null
-        ? '${widget.selectedDay!.month}월 ${widget.selectedDay!.day}일 운동 기록'
-        : '오늘의 운동 기록';
-
-    final List<Widget> children = [
-      const SizedBox(height: kToolbarHeight),
-      WorkoutLogSection(
-        selectedDay: widget.selectedDay,
-        onAddWorkout: widget.onAddWorkout,
-        onDeleteWorkout: widget.onDeleteWorkout,
-        showOnlyHeader: widget.showOnlyHeader,
-        sheetController: widget.sheetController,
-      ),
-    ];
-
-    if (!widget.showOnlyHeader) {
-      children.add(const SizedBox(height: 80));
+    if (widget.showOnlyHeader) {
+      return ListView(
+        controller: widget.controller,
+        children: [
+          WorkoutLogSection(
+            selectedDay: widget.selectedDay,
+            onAddWorkout: widget.onAddWorkout,
+            onDeleteWorkout: widget.onDeleteWorkout,
+            showOnlyHeader: true,
+            sheetController: widget.sheetController,
+          ),
+        ],
+      );
     }
 
-    final content = ListView(
+    return CustomScrollView(
       controller: widget.controller,
-      children: children,
-    );
-
-    final appBar = AnimatedPositioned(
-      duration: const Duration(milliseconds: 200),
-      top: -kToolbarHeight * (1 - _sheetSize),
-      left: 0,
-      right: 0,
-      child: AnimatedOpacity(
-        opacity: _sheetSize.clamp(0.0, 1.0),
-        duration: const Duration(milliseconds: 200),
-        child: Container(
-          height: kToolbarHeight,
-          alignment: Alignment.centerLeft,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          color: Theme.of(context).colorScheme.primary,
-          child: Text(
-            titleText,
-            style: Theme.of(context).appBarTheme.titleTextStyle ??
-                Theme.of(context).textTheme.titleLarge?.copyWith(
-                      color: Theme.of(context).appBarTheme.foregroundColor,
-                    ),
+      slivers: [
+        const SliverAppBar(
+          title: Text('오늘의 운동'),
+          pinned: true,
+        ),
+        SliverToBoxAdapter(
+          child: WorkoutLogSection(
+            selectedDay: widget.selectedDay,
+            onAddWorkout: widget.onAddWorkout,
+            onDeleteWorkout: widget.onDeleteWorkout,
+            showOnlyHeader: false,
+            sheetController: widget.sheetController,
           ),
         ),
-      ),
-    );
-
-    return Stack(
-      children: [
-        content,
-        appBar,
+        const SliverToBoxAdapter(child: SizedBox(height: 80)),
       ],
     );
   }
