@@ -9,9 +9,7 @@ import '../../providers/exercise_presets.dart';
 import '../../providers/workout_data.dart';
 
 class FavoriteProgressSection extends StatefulWidget {
-  final VoidCallback? onScrollDown;
-
-  const FavoriteProgressSection({super.key, this.onScrollDown});
+  const FavoriteProgressSection({super.key});
 
   @override
   State<FavoriteProgressSection> createState() => _FavoriteProgressSectionState();
@@ -80,34 +78,23 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
           ),
           const SizedBox(height: 16),
           Expanded(
-            child: NotificationListener<ScrollNotification>(
-              onNotification: (notification) {
-                if (notification.metrics.pixels >=
-                        notification.metrics.maxScrollExtent &&
-                    notification is OverscrollNotification &&
-                    notification.overscroll > 0) {
-                  widget.onScrollDown?.call();
-                }
-                return false;
+            child: ReorderableListView(
+              onReorder: (oldIndex, newIndex) {
+                setState(() {
+                  if (newIndex > oldIndex) newIndex -= 1;
+                  final item = _order.removeAt(oldIndex);
+                  _order.insert(newIndex, item);
+                });
+                _saveOrder();
               },
-              child: ReorderableListView(
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final item = _order.removeAt(oldIndex);
-                    _order.insert(newIndex, item);
-                  });
-                  _saveOrder();
-                },
-                children: [
-                  for (final ex in _order)
-                    Padding(
-                      key: ValueKey(ex),
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: _buildItem(context, ex, data),
-                    ),
-                ],
-              ),
+              children: [
+                for (final ex in _order)
+                  Padding(
+                    key: ValueKey(ex),
+                    padding: const EdgeInsets.only(bottom: 8),
+                    child: _buildItem(context, ex, data),
+                  ),
+              ],
             ),
           ),
         ],
