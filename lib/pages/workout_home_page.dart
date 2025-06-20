@@ -138,7 +138,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                             color: Colors.transparent,
                 ),
               ),
-              ),
+              
+              
             ],
           ),
                     Stack(
@@ -182,6 +183,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                 ],
               ),
             ),
+            ),
           ],
         ),
       ),
@@ -223,7 +225,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   bool _hitCard(Offset position) {
     final result = HitTestResult();
     final view = WidgetsBinding.instance.platformDispatcher.views.first;
-    WidgetsBinding.instance.hitTestInView(result, position, view);
+    WidgetsBinding.instance.hitTestInView(result, position, 10);
     bool hit = false;
     for (final entry in result.path) {
       final target = entry.target;
