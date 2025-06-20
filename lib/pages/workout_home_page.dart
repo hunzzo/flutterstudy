@@ -240,9 +240,18 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     return topLeft & box.size;
   }
 
+  Rect? _activeListRect() {
+    final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
+    return _widgetRect(key);
+  }
+
   bool _shouldHandleDrag(Offset position) {
     if (_currentPage == 0) {
-      return !_hitCard(position);
+      final listRect = _activeListRect();
+      if (listRect != null && listRect.contains(position)) {
+        return false;
+      }
+      return true;
     }
     final rect = _widgetRect(_sheetKey);
     if (rect == null) return true;
