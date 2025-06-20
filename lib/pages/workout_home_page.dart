@@ -86,14 +86,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                     length: 2,
                     child: Column(
                       children: [
-                        TabBar(
-                          labelColor:
-                              Theme.of(context).colorScheme.primary,
-                          tabs: const [
-                            Tab(text: '근육별 최근 기록'),
-                            Tab(text: '즐겨찾기 무게 추세'),
-                          ],
-                        ),
                         Expanded(
                           child: TabBarView(
                             children: [
@@ -101,6 +93,14 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                               FavoriteProgressSection(),
                             ],
                           ),
+                        ),
+                        TabBar(
+                          labelColor:
+                              Theme.of(context).colorScheme.primary,
+                          tabs: const [
+                            Tab(text: '근육별 최근 기록'),
+                            Tab(text: '즐겨찾기 무게 추세'),
+                          ],
                         ),
                       ],
                     ),
