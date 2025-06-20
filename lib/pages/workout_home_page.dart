@@ -11,6 +11,9 @@ import 'settings_page.dart';
 
 import '../widgets/workout_log_sheet.dart';
 
+// 드래그해서 페이지 전환 시 필요한 최소 스와이프 비율
+const double _kPageSwipeThreshold = 0.1;
+
 // 홈 화면 페이지로 달력과 운동 기록 시트를 포함한다
 class WorkoutHomePage extends StatefulWidget {
   const WorkoutHomePage({super.key});
@@ -284,7 +287,12 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   // 드래그 종료 후 가장 가까운 페이지로 정렬
   void _handlePageDragEnd(DragEndDetails details) {
     final double page = _pageController.page ?? _currentPage.toDouble();
-    final int target = page.round();
+    final double delta = page - _currentPage;
+    int target = _currentPage;
+    if (delta.abs() > _kPageSwipeThreshold) {
+      target = delta > 0 ? _currentPage + 1 : _currentPage - 1;
+    }
+    target = target.clamp(0, 1);
     _pageController.animateToPage(
       target,
       duration: const Duration(milliseconds: 200),
