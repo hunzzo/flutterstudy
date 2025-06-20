@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:table_calendar/table_calendar.dart';
+import '../utils/ui_utils.dart';
 
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
@@ -246,22 +247,16 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     return hit;
   }
 
-  Rect? _widgetRect(GlobalKey key) {
-    final context = key.currentContext;
-    if (context == null) return null;
-    final box = context.findRenderObject() as RenderBox?;
-    if (box == null) return null;
-    final topLeft = box.localToGlobal(Offset.zero);
-    return topLeft & box.size;
-  }
-
+  // 현재 탭에서 스크롤 가능한 리스트 영역의 위치
   Rect? _activeListRect() {
     final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
-    return _widgetRect(key);
+    return widgetRect(key);
   }
 
-  Rect? _swipeRegionRect() => _widgetRect(_swipeRegionKey);
+  // 페이지 전환을 위한 스와이프 영역 위치
+  Rect? _swipeRegionRect() => widgetRect(_swipeRegionKey);
 
+  // 드래그가 페이지 이동을 처리해야 하는지 여부 판단
   bool _shouldHandleDrag(Offset position) {
     if (_currentPage == 0) {
       final overlay = _swipeRegionRect();
@@ -274,11 +269,12 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
       }
       return true;
     }
-    final rect = _widgetRect(_sheetKey);
+    final rect = widgetRect(_sheetKey);
     if (rect == null) return true;
     return !rect.contains(position);
   }
 
+  // 페이지 뷰를 직접 움직여 부드러운 전환을 제공
   void _handlePageDragUpdate(DragUpdateDetails details) {
     final pos = _pageController.position.pixels - details.delta.dy;
     _pageController.jumpTo(pos.clamp(
@@ -287,6 +283,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     ));
   }
 
+  // 드래그 종료 후 가장 가까운 페이지로 정렬
   void _handlePageDragEnd(DragEndDetails details) {
     final double page = _pageController.page ?? _currentPage.toDouble();
     final int target = page.round();

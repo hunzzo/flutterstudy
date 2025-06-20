@@ -4,9 +4,7 @@ import '../pages/workout_log_page.dart';
 // 공통 동작을 위한 유틸 함수
 import '../utils/workout_log_utils.dart';
 
-/// Bottom sheet variant of [WorkoutLogPage]. It embeds [WorkoutLogBody]
-/// inside a [DraggableScrollableSheet] so the user can drag it up from the
-/// calendar view.
+/// [WorkoutLogPage]를 시트 형태로 보여 주어 달력 화면에서 위로 끌어올릴 수 있다.
 // 홈 화면에서 사용되는 드래그 가능한 운동 기록 시트 위젯
 class WorkoutLogSheet extends StatefulWidget {
   final DateTime? selectedDay;
@@ -36,8 +34,8 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
     widget.controller.addListener(_handleDrag);
   }
 
-  /// When the sheet is dragged past a certain threshold it automatically
-  /// expands to full height. Dragging it back down collapses it again.
+  /// 시트를 일정 크기 이상 끌어올리면 자동으로 전체 높이로 확장되고
+  /// 다시 아래로 내리면 접힌다.
   void _handleDrag() {
     if (!_expanded && widget.controller.size > 0.3) {
       _expanded = true;
@@ -74,7 +72,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
           ),
           child: Column(
             children: [
-              // Reuse the same body widget as the full page.
+              // 전체 화면에서 사용하는 본문 위젯을 그대로 재사용한다.
               Expanded(
                 child: WorkoutLogBody(
                   selectedDay: widget.selectedDay,

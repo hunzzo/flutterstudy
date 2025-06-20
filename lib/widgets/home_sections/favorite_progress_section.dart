@@ -50,7 +50,7 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
         .where((p) => presets.isFavorite(p))
         .toList();
 
-    // Ensure local order list matches current favorites
+    // 즐겨찾기 목록과 순서 데이터가 일치하도록 정리
     List<String> ordered = _order.where(favorites.contains).toList();
     for (final f in favorites) {
       if (!ordered.contains(f)) ordered.add(f);
