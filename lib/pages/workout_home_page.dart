@@ -209,6 +209,28 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     );
   }
 
+  bool _hitCard(Offset position) {
+    final result = HitTestResult();
+    WidgetsBinding.instance.hitTest(result, position);
+    bool hit = false;
+    for (final entry in result.path) {
+      final target = entry.target;
+      assert(() {
+        final widget = (target as dynamic).debugCreator?.widget;
+        if (widget is Card) {
+          hit = true;
+        } else if (widget is Material && widget.type == MaterialType.card) {
+          hit = true;
+        }
+        return true;
+      }());
+      if (!hit && target.runtimeType.toString() == 'RenderPhysicalModel') {
+        hit = true;
+      }
+    }
+    return hit;
+  }
+
   Rect? _widgetRect(GlobalKey key) {
     final context = key.currentContext;
     if (context == null) return null;
@@ -219,13 +241,10 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   }
 
   bool _shouldHandleDrag(Offset position) {
-    Rect? rect;
     if (_currentPage == 0) {
-      final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
-      rect = _widgetRect(key);
-    } else {
-      rect = _widgetRect(_sheetKey);
+      return !_hitCard(position);
     }
+    final rect = _widgetRect(_sheetKey);
     if (rect == null) return true;
     return !rect.contains(position);
   }
