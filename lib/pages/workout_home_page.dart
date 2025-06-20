@@ -150,29 +150,31 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
                         onHorizontalDragEnd: _handleCalendarHorizontalDrag,
-                        child: CalendarSection(
-                          calendarFormat: _calendarFormat,
-                          focusedDay: _focusedDay,
-                          selectedDay: _selectedDay,
-                          onFormatChanged: (format) {
-                            setState(() => _calendarFormat = format);
-                          },
-                          onDaySelected: (selectedDay, focusedDay) {
-                            if (!isSameDay(_selectedDay, selectedDay)) {
-                              setState(() {
-                                _selectedDay = selectedDay;
-                                _focusedDay = focusedDay;
-                              });
-                            }
-                            _sheetController.animateTo(
-                              1.0,
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                            );
-                          },
-                          onPageChanged: (focusedDay) {
-                            _focusedDay = focusedDay;
-                          },
+                        child: SizedBox(
+                          child: CalendarSection(
+                            calendarFormat: _calendarFormat,
+                            focusedDay: _focusedDay,
+                            selectedDay: _selectedDay,
+                            onFormatChanged: (format) {
+                              setState(() => _calendarFormat = format);
+                            },
+                            onDaySelected: (selectedDay, focusedDay) {
+                              if (!isSameDay(_selectedDay, selectedDay)) {
+                                setState(() {
+                                  _selectedDay = selectedDay;
+                                  _focusedDay = focusedDay;
+                                });
+                              }
+                              _sheetController.animateTo(
+                                1.0,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                            onPageChanged: (focusedDay) {
+                              _focusedDay = focusedDay;
+                            },
+                          ),
                         ),
                       ),
                       WorkoutLogSheet(

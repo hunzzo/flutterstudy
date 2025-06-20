@@ -39,15 +39,17 @@ class CalendarSection extends StatelessWidget {
       child: Column(
         children: [
           Expanded(
-            child: TableCalendar<WorkoutRecord>(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: focusedDay,
-            calendarFormat: calendarFormat,
-            eventLoader: (day) => _getWorkoutsForDay(context, day),
-            startingDayOfWeek: StartingDayOfWeek.monday,
-            availableGestures: AvailableGestures.horizontalSwipe,
-            calendarStyle: CalendarStyle(
+            child:TableCalendar<WorkoutRecord>(
+              rowHeight: 80,
+              //shouldFillViewport: true,
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: focusedDay,
+              calendarFormat: calendarFormat,
+              eventLoader: (day) => _getWorkoutsForDay(context, day),
+              startingDayOfWeek: StartingDayOfWeek.monday,
+              availableGestures: AvailableGestures.horizontalSwipe,
+              calendarStyle: CalendarStyle(
               outsideDaysVisible: false,
               defaultTextStyle: TextStyle(color: textColor),
               weekendTextStyle: TextStyle(color: textColor),
@@ -86,7 +88,7 @@ class CalendarSection extends StatelessWidget {
             onDaySelected: onDaySelected,
             onFormatChanged: onFormatChanged,
             onPageChanged: onPageChanged,
-          ),
+                      ),
           ),
          
         ],

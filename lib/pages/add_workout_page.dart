@@ -67,6 +67,11 @@ class _AddWorkoutPageState extends State<AddWorkoutPage> {
           SizedBox(
             height: 80,
             child: ReorderableListView(
+              proxyDecorator: (child, index, animation) => 
+                  Material(
+                    color: Colors.transparent,
+                    child: child,
+                  ),
               scrollDirection: Axis.horizontal,
               onReorder: (oldIndex, newIndex) {
                 setState(() {
