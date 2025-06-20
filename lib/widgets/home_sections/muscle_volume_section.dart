@@ -50,18 +50,6 @@ class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.analytics,
-                  color: Theme.of(context).textTheme.titleLarge?.color),
-              const SizedBox(width: 8),
-              Text(
-                '근육별 최근 기록',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: SingleChildScrollView(
               child: ReorderableListView(

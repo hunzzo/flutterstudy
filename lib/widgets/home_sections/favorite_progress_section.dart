@@ -68,18 +68,6 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.trending_up,
-                  color: Theme.of(context).textTheme.titleLarge?.color),
-              const SizedBox(width: 8),
-              Text(
-                '즐겨찾기 무게 추세',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
+import 'dart:ui';
 import 'package:table_calendar/table_calendar.dart';
 import '../utils/ui_utils.dart';
 
 //import '../models/workout.dart';
 import '../widgets/home_sections/calendar_section.dart';
 import '../widgets/home_sections/favorite_progress_section.dart';
-//import '../widgets/home_sections/muscle_recovery_section.dart';
 import '../widgets/home_sections/muscle_volume_section.dart';
 import 'settings_page.dart';
 
@@ -108,15 +108,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                       children: [
                         Column(
                           children: [
-                            Expanded(
-                              child: TabBarView(
-                                controller: _tabController,
-                                children: [
-                                  MuscleVolumeSection(listKey: _muscleKey),
-                                  FavoriteProgressSection(listKey: _favoriteKey),
-                                ],
-                              ),
-                            ),
                             TabBar(
                               controller: _tabController,
                               labelColor:
@@ -125,6 +116,15 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                                 Tab(text: '근육별 최근 기록'),
                                 Tab(text: '즐겨찾기 무게 추세'),
                               ],
+                            ),
+                            Expanded(
+                              child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  MuscleVolumeSection(listKey: _muscleKey),
+                                  FavoriteProgressSection(listKey: _favoriteKey),
+                                ],
+                              ),
                             ),
                           ],
                         ),
@@ -136,10 +136,11 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                           child: Container(
                             key: _swipeRegionKey,
                             color: Colors.transparent,
-                          ),
-                        ),
-                      ],
-                    ),
+                ),
+              ),
+              ),
+            ],
+          ),
                     Stack(
                     children: [
                       GestureDetector(
@@ -221,7 +222,8 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
 
   bool _hitCard(Offset position) {
     final result = HitTestResult();
-    WidgetsBinding.instance.hitTest(result, position);
+    final view = WidgetsBinding.instance.platformDispatcher.views.first;
+    WidgetsBinding.instance.hitTestInView(result, position, view);
     bool hit = false;
     for (final entry in result.path) {
       final target = entry.target;
