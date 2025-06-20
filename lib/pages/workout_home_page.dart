@@ -102,25 +102,36 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                     });
                   },
                   children: [
-                    Column(
+                    Stack(
                       children: [
-                        Expanded(
-                          child: TabBarView(
-                            controller: _tabController,
-                            children: [
-                              MuscleVolumeSection(listKey: _muscleKey),
-                              FavoriteProgressSection(listKey: _favoriteKey),
-                            ],
-                          ),
-                        ),
-                        TabBar(
-                          controller: _tabController,
-                          labelColor:
-                              Theme.of(context).colorScheme.primary,
-                          tabs: const [
-                            Tab(text: '근육별 최근 기록'),
-                            Tab(text: '즐겨찾기 무게 추세'),
+                        Column(
+                          children: [
+                            Expanded(
+                              child: TabBarView(
+                                controller: _tabController,
+                                children: [
+                                  MuscleVolumeSection(listKey: _muscleKey),
+                                  FavoriteProgressSection(listKey: _favoriteKey),
+                                ],
+                              ),
+                            ),
+                            TabBar(
+                              controller: _tabController,
+                              labelColor:
+                                  Theme.of(context).colorScheme.primary,
+                              tabs: const [
+                                Tab(text: '근육별 최근 기록'),
+                                Tab(text: '즐겨찾기 무게 추세'),
+                              ],
+                            ),
                           ],
+                        ),
+                        Positioned(
+                          left: 0,
+                          right: 0,
+                          bottom: kTextTabBarHeight,
+                          height: 40,
+                          child: Container(color: Colors.transparent),
                         ),
                       ],
                     ),
