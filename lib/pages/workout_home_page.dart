@@ -218,12 +218,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     _scrollController.jumpTo(combined);
   }
 
-  void _goToCalendar() {
-    _pageController.nextPage(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
-    );
-  }
 
   bool _hitCard(Offset position) {
     final result = HitTestResult();
@@ -265,8 +259,10 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
       }
       final listRect = _activeListRect();
       if (listRect != null && listRect.contains(position)) {
-        return false;
+        // 카드 위에서 시작한 드래그는 리스트 스크롤로 처리
+        return !_hitCard(position);
       }
+      // 리스트 영역 밖에서 시작하면 페이지 전환 처리
       return true;
     }
     final rect = widgetRect(_sheetKey);
