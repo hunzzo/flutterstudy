@@ -288,9 +288,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   // 드래그 종료 후 가장 가까운 페이지로 정렬
   void _handlePageDragEnd(DragEndDetails details) {
     final double page = _pageController.page ?? _currentPage.toDouble();
-    // final int target = page.round();
-
-        final double delta = page - _currentPage;
+    final double delta = page - _currentPage;
     int target = _currentPage;
     if (delta.abs() > _kPageSwipeThreshold) {
       target = delta > 0 ? _currentPage + 1 : _currentPage - 1;
