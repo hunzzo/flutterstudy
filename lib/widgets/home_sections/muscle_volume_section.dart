@@ -7,7 +7,8 @@ import '../../providers/workout_data.dart';
 import '../simple_line_chart.dart';
 
 class MuscleVolumeSection extends StatefulWidget {
-  const MuscleVolumeSection({super.key});
+  final Key? listKey;
+  const MuscleVolumeSection({super.key, this.listKey});
 
   @override
   State<MuscleVolumeSection> createState() => _MuscleVolumeSectionState();
@@ -63,6 +64,7 @@ class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
           const SizedBox(height: 16),
           Expanded(
             child: ReorderableListView(
+              key: widget.listKey,
               onReorder: (oldIndex, newIndex) {
                 setState(() {
                   if (newIndex > oldIndex) newIndex -= 1;

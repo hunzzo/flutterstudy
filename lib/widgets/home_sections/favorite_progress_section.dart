@@ -10,8 +10,9 @@ import '../../providers/workout_data.dart';
 
 class FavoriteProgressSection extends StatefulWidget {
   final VoidCallback? onScrollDown;
+  final Key? listKey;
 
-  const FavoriteProgressSection({super.key, this.onScrollDown});
+  const FavoriteProgressSection({super.key, this.onScrollDown, this.listKey});
 
   @override
   State<FavoriteProgressSection> createState() => _FavoriteProgressSectionState();
@@ -91,6 +92,7 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
                 return false;
               },
               child: ReorderableListView(
+                key: widget.listKey,
                 onReorder: (oldIndex, newIndex) {
                   setState(() {
                     if (newIndex > oldIndex) newIndex -= 1;

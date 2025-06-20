@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/gestures.dart';
 import 'package:table_calendar/table_calendar.dart';
 
 //import '../models/workout.dart';
@@ -19,7 +20,8 @@ class WorkoutHomePage extends StatefulWidget {
 }
 
 // 홈 페이지의 상태 관리 클래스
-class WorkoutHomePageState extends State<WorkoutHomePage> {
+class WorkoutHomePageState extends State<WorkoutHomePage>
+    with TickerProviderStateMixin {
   CalendarFormat _calendarFormat = CalendarFormat.month;
   DateTime _focusedDay = DateTime.now();
   DateTime? _selectedDay;
@@ -30,12 +32,18 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
   late ScrollController _scrollController;
   double _logScrollOffset = 0;
   int _currentPage = 1;
+  late TabController _tabController;
+  final GlobalKey _muscleKey = GlobalKey();
+  final GlobalKey _favoriteKey = GlobalKey();
+  double? _dragStartOffset;
+  bool _draggingList = false;
 
   @override
   void initState() {
     super.initState();
     _selectedDay = DateTime.now();
     _pageController = PageController(initialPage: _currentPage);
+    _tabController = TabController(length: 2, vsync: this);
     _sheetController = DraggableScrollableController();
     _scrollController = ScrollController();
     _sheetController.addListener(_handleSheetDrag);
@@ -73,28 +81,42 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
               ],
             ),
             SliverFillRemaining(
-              child: PageView(
-                controller: _pageController,
-                scrollDirection: Axis.vertical,
-                onPageChanged: (index) {
-                  setState(() {
-                    _currentPage = index;
-                  });
+              child: RawGestureDetector(
+                gestures: {
+                  _OutsideListDragGestureRecognizer:
+                      GestureRecognizerFactoryWithHandlers<
+                          _OutsideListDragGestureRecognizer>(
+                    () =>
+                        _OutsideListDragGestureRecognizer(_isPointInsideList),
+                    (_OutsideListDragGestureRecognizer instance) {
+                      instance.onUpdate = _handlePageDragUpdate;
+                      instance.onEnd = _handlePageDragEnd;
+                    },
+                  ),
                 },
-                children: [
-                  DefaultTabController(
-                    length: 2,
-                    child: Column(
+                child: PageView(
+                  controller: _pageController,
+                  physics: const NeverScrollableScrollPhysics(),
+                  scrollDirection: Axis.vertical,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPage = index;
+                    });
+                  },
+                  children: [
+                    Column(
                       children: [
                         Expanded(
                           child: TabBarView(
+                            controller: _tabController,
                             children: [
-                              MuscleVolumeSection(),
-                              FavoriteProgressSection(),
+                              MuscleVolumeSection(listKey: _muscleKey),
+                              FavoriteProgressSection(listKey: _favoriteKey),
                             ],
                           ),
                         ),
                         TabBar(
+                          controller: _tabController,
                           labelColor:
                               Theme.of(context).colorScheme.primary,
                           tabs: const [
@@ -104,8 +126,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
                         ),
                       ],
                     ),
-                  ),
-                  Stack(
+                    Stack(
                     children: [
                       GestureDetector(
                         behavior: HitTestBehavior.translucent,
@@ -189,11 +210,58 @@ class WorkoutHomePageState extends State<WorkoutHomePage> {
     );
   }
 
+  bool _isPointInsideList(Offset position) {
+    if (_currentPage != 0) return false;
+    final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
+    final context = key.currentContext;
+    if (context == null) return false;
+    final box = context.findRenderObject() as RenderBox?;
+    if (box == null) return false;
+    final topLeft = box.localToGlobal(Offset.zero);
+    final rect = topLeft & box.size;
+    return rect.contains(position);
+  }
+
+  void _handlePageDragUpdate(DragUpdateDetails details) {
+    final pos = _pageController.position.pixels - details.delta.dy;
+    _pageController.jumpTo(pos.clamp(
+      _pageController.position.minScrollExtent,
+      _pageController.position.maxScrollExtent,
+    ));
+  }
+
+  void _handlePageDragEnd(DragEndDetails details) {
+    final double page = _pageController.page ?? _currentPage.toDouble();
+    final int target = page.round();
+    _pageController.animateToPage(
+      target,
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOut,
+    );
+  }
+
   @override
   void dispose() {
     _sheetController.removeListener(_handleSheetDrag);
+    _tabController.dispose();
     _pageController.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+}
+
+class _OutsideListDragGestureRecognizer extends VerticalDragGestureRecognizer {
+  final bool Function(Offset) _shouldHandle;
+
+  _OutsideListDragGestureRecognizer(this._shouldHandle);
+
+  @override
+  void addAllowedPointer(PointerDownEvent event) {
+    if (_shouldHandle(event.position)) {
+      super.addAllowedPointer(event);
+    } else {
+      stopTrackingPointer(event.pointer);
+      resolve(GestureDisposition.rejected);
+    }
   }
 }
