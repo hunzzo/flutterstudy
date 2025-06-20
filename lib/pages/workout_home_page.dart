@@ -36,6 +36,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   final GlobalKey _muscleKey = GlobalKey();
   final GlobalKey _favoriteKey = GlobalKey();
   final GlobalKey _sheetKey = GlobalKey();
+  final GlobalKey _swipeRegionKey = GlobalKey();
 
   @override
   void initState() {
@@ -131,7 +132,10 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                           right: 0,
                           bottom: kTextTabBarHeight,
                           height: 40,
-                          child: Container(color: Colors.transparent),
+                          child: Container(
+                            key: _swipeRegionKey,
+                            color: Colors.transparent,
+                          ),
                         ),
                       ],
                     ),
@@ -256,8 +260,14 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     return _widgetRect(key);
   }
 
+  Rect? _swipeRegionRect() => _widgetRect(_swipeRegionKey);
+
   bool _shouldHandleDrag(Offset position) {
     if (_currentPage == 0) {
+      final overlay = _swipeRegionRect();
+      if (overlay != null && overlay.contains(position)) {
+        return true;
+      }
       final listRect = _activeListRect();
       if (listRect != null && listRect.contains(position)) {
         return false;
