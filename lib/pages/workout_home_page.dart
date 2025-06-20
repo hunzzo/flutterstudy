@@ -35,8 +35,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
   late TabController _tabController;
   final GlobalKey _muscleKey = GlobalKey();
   final GlobalKey _favoriteKey = GlobalKey();
-  double? _dragStartOffset;
-  bool _draggingList = false;
+  final GlobalKey _sheetKey = GlobalKey();
 
   @override
   void initState() {
@@ -86,8 +85,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                   _OutsideListDragGestureRecognizer:
                       GestureRecognizerFactoryWithHandlers<
                           _OutsideListDragGestureRecognizer>(
-                    () =>
-                        _OutsideListDragGestureRecognizer(_isPointInsideList),
+                    () => _OutsideListDragGestureRecognizer(_shouldHandleDrag),
                     (_OutsideListDragGestureRecognizer instance) {
                       instance.onUpdate = _handlePageDragUpdate;
                       instance.onEnd = _handlePageDragEnd;
@@ -160,6 +158,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                         selectedDay: _selectedDay,
                         controller: _sheetController,
                         onScroll: _handleLogScroll,
+                        containerKey: _sheetKey,
                       ),
                     ],
                   ),
@@ -210,16 +209,25 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
     );
   }
 
-  bool _isPointInsideList(Offset position) {
-    if (_currentPage != 0) return false;
-    final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
+  Rect? _widgetRect(GlobalKey key) {
     final context = key.currentContext;
-    if (context == null) return false;
+    if (context == null) return null;
     final box = context.findRenderObject() as RenderBox?;
-    if (box == null) return false;
+    if (box == null) return null;
     final topLeft = box.localToGlobal(Offset.zero);
-    final rect = topLeft & box.size;
-    return rect.contains(position);
+    return topLeft & box.size;
+  }
+
+  bool _shouldHandleDrag(Offset position) {
+    Rect? rect;
+    if (_currentPage == 0) {
+      final key = _tabController.index == 0 ? _muscleKey : _favoriteKey;
+      rect = _widgetRect(key);
+    } else {
+      rect = _widgetRect(_sheetKey);
+    }
+    if (rect == null) return true;
+    return !rect.contains(position);
   }
 
   void _handlePageDragUpdate(DragUpdateDetails details) {

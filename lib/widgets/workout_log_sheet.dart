@@ -12,12 +12,14 @@ class WorkoutLogSheet extends StatefulWidget {
   final DateTime? selectedDay;
   final DraggableScrollableController controller;
   final void Function(double)? onScroll;
+  final Key? containerKey;
 
   const WorkoutLogSheet({
     super.key,
     required this.selectedDay,
     required this.controller,
     this.onScroll,
+    this.containerKey,
   });
 
   @override
@@ -64,6 +66,7 @@ class _WorkoutLogSheetState extends State<WorkoutLogSheet> {
       maxChildSize: 1.0,
       builder: (context, scrollController) {
         return Container(
+          key: widget.containerKey,
           decoration: BoxDecoration(
             color: Theme.of(context).scaffoldBackgroundColor,
             borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
