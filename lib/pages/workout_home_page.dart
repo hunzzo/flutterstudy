@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
-import 'dart:ui';
 import 'package:table_calendar/table_calendar.dart';
 import '../utils/ui_utils.dart';
 
@@ -224,7 +223,6 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
 
   bool _hitCard(Offset position) {
     final result = HitTestResult();
-    final view = WidgetsBinding.instance.platformDispatcher.views.first;
     WidgetsBinding.instance.hitTestInView(result, position, 10);
     bool hit = false;
     for (final entry in result.path) {
