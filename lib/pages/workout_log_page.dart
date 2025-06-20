@@ -11,9 +11,9 @@ import '../models/workout.dart';
 // 공통 동작을 모아둔 유틸 함수
 import '../utils/workout_log_utils.dart';
 
-/// This file defines both the full screen workout log page and the reusable
-/// [WorkoutLogBody] widget that is also embedded in [WorkoutLogSheet]. The
-/// sheet simply wraps this body in a [DraggableScrollableSheet].
+/// 이 파일은 전체 화면용 운동 기록 페이지와 시트에서 재사용되는
+/// [WorkoutLogBody] 위젯을 함께 정의한다.
+/// 시트 버전은 [DraggableScrollableSheet] 안에 이 위젯을 넣어 사용한다.
 
 // 전체 화면이나 시트에서 재사용할 운동 기록 목록 본문 위젯
 class WorkoutLogBody extends StatefulWidget {
@@ -92,23 +92,17 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
       );
     }
 
-    return CustomScrollView(
+    return ListView(
       controller: widget.controller,
-      slivers: [
-        const SliverAppBar(
-          title: Text('오늘의 운동'),
-          pinned: true,
+      children: [
+        WorkoutLogSection(
+          selectedDay: widget.selectedDay,
+          onAddWorkout: widget.onAddWorkout,
+          onDeleteWorkout: widget.onDeleteWorkout,
+          showOnlyHeader: false,
+          sheetController: widget.sheetController,
         ),
-        SliverToBoxAdapter(
-          child: WorkoutLogSection(
-            selectedDay: widget.selectedDay,
-            onAddWorkout: widget.onAddWorkout,
-            onDeleteWorkout: widget.onDeleteWorkout,
-            showOnlyHeader: false,
-            sheetController: widget.sheetController,
-          ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 80)),
+        const SizedBox(height: 80),
       ],
     );
   }
@@ -128,7 +122,7 @@ class _WorkoutLogPageState extends State<WorkoutLogPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      // Reusable body shared with [WorkoutLogSheet]. Includes sliver app bar.
+      // WorkoutLogSheet에서도 사용되는 본문 위젯으로 앱바를 포함한다.
       body: WorkoutLogBody(
         selectedDay: widget.selectedDay,
         onAddWorkout: () => openAddWorkoutPage(context, widget.selectedDay!),

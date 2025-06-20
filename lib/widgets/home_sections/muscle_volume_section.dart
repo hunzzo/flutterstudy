@@ -7,7 +7,8 @@ import '../../providers/workout_data.dart';
 import '../simple_line_chart.dart';
 
 class MuscleVolumeSection extends StatefulWidget {
-  const MuscleVolumeSection({super.key});
+  final Key? listKey;
+  const MuscleVolumeSection({super.key, this.listKey});
 
   @override
   State<MuscleVolumeSection> createState() => _MuscleVolumeSectionState();
@@ -49,36 +50,29 @@ class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.analytics,
-                  color: Theme.of(context).textTheme.titleLarge?.color),
-              const SizedBox(width: 8),
-              Text(
-                '근육별 최근 기록',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
-            child: ReorderableListView(
-              onReorder: (oldIndex, newIndex) {
-                setState(() {
-                  if (newIndex > oldIndex) newIndex -= 1;
-                  final item = _order.removeAt(oldIndex);
-                  _order.insert(newIndex, item);
-                });
-                _saveOrder();
-              },
-              children: [
-                for (final g in _order)
-                  Padding(
-                    key: ValueKey(g.name),
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: _buildItem(context, g, data),
-                  ),
-              ],
+            child: SingleChildScrollView(
+              child: ReorderableListView(
+                key: widget.listKey,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                onReorder: (oldIndex, newIndex) {
+                  setState(() {
+                    if (newIndex > oldIndex) newIndex -= 1;
+                    final item = _order.removeAt(oldIndex);
+                    _order.insert(newIndex, item);
+                  });
+                  _saveOrder();
+                },
+                children: [
+                  for (final g in _order)
+                    Padding(
+                      key: ValueKey(g.name),
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: _buildItem(context, g, data),
+                    ),
+                ],
+              ),
             ),
           ),
         ],

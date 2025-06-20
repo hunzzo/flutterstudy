@@ -10,8 +10,9 @@ import '../../providers/workout_data.dart';
 
 class FavoriteProgressSection extends StatefulWidget {
   final VoidCallback? onScrollDown;
+  final Key? listKey;
 
-  const FavoriteProgressSection({super.key, this.onScrollDown});
+  const FavoriteProgressSection({super.key, this.onScrollDown, this.listKey});
 
   @override
   State<FavoriteProgressSection> createState() => _FavoriteProgressSectionState();
@@ -49,7 +50,7 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
         .where((p) => presets.isFavorite(p))
         .toList();
 
-    // Ensure local order list matches current favorites
+    // 즐겨찾기 목록과 순서 데이터가 일치하도록 정리
     List<String> ordered = _order.where(favorites.contains).toList();
     for (final f in favorites) {
       if (!ordered.contains(f)) ordered.add(f);
@@ -67,18 +68,6 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            children: [
-              Icon(Icons.trending_up,
-                  color: Theme.of(context).textTheme.titleLarge?.color),
-              const SizedBox(width: 8),
-              Text(
-                '즐겨찾기 무게 추세',
-                style: Theme.of(context).textTheme.titleLarge,
-              ),
-            ],
-          ),
-          const SizedBox(height: 16),
           Expanded(
             child: NotificationListener<ScrollNotification>(
               onNotification: (notification) {
@@ -90,23 +79,28 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
                 }
                 return false;
               },
-              child: ReorderableListView(
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final item = _order.removeAt(oldIndex);
-                    _order.insert(newIndex, item);
-                  });
-                  _saveOrder();
-                },
-                children: [
-                  for (final ex in _order)
-                    Padding(
-                      key: ValueKey(ex),
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: _buildItem(context, ex, data),
-                    ),
-                ],
+              child: SingleChildScrollView(
+                child: ReorderableListView(
+                  key: widget.listKey,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final item = _order.removeAt(oldIndex);
+                      _order.insert(newIndex, item);
+                    });
+                    _saveOrder();
+                  },
+                  children: [
+                    for (final ex in _order)
+                      Padding(
+                        key: ValueKey(ex),
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildItem(context, ex, data),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
