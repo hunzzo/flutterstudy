@@ -91,24 +91,28 @@ class _FavoriteProgressSectionState extends State<FavoriteProgressSection> {
                 }
                 return false;
               },
-              child: ReorderableListView(
-                key: widget.listKey,
-                onReorder: (oldIndex, newIndex) {
-                  setState(() {
-                    if (newIndex > oldIndex) newIndex -= 1;
-                    final item = _order.removeAt(oldIndex);
-                    _order.insert(newIndex, item);
-                  });
-                  _saveOrder();
-                },
-                children: [
-                  for (final ex in _order)
-                    Padding(
-                      key: ValueKey(ex),
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: _buildItem(context, ex, data),
-                    ),
-                ],
+              child: SingleChildScrollView(
+                child: ReorderableListView(
+                  key: widget.listKey,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  onReorder: (oldIndex, newIndex) {
+                    setState(() {
+                      if (newIndex > oldIndex) newIndex -= 1;
+                      final item = _order.removeAt(oldIndex);
+                      _order.insert(newIndex, item);
+                    });
+                    _saveOrder();
+                  },
+                  children: [
+                    for (final ex in _order)
+                      Padding(
+                        key: ValueKey(ex),
+                        padding: const EdgeInsets.only(bottom: 8),
+                        child: _buildItem(context, ex, data),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),
