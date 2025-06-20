@@ -92,23 +92,17 @@ class _WorkoutLogBodyState extends State<WorkoutLogBody> {
       );
     }
 
-    return CustomScrollView(
+    return ListView(
       controller: widget.controller,
-      slivers: [
-        const SliverAppBar(
-          title: Text('오늘의 운동'),
-          pinned: true,
+      children: [
+        WorkoutLogSection(
+          selectedDay: widget.selectedDay,
+          onAddWorkout: widget.onAddWorkout,
+          onDeleteWorkout: widget.onDeleteWorkout,
+          showOnlyHeader: false,
+          sheetController: widget.sheetController,
         ),
-        SliverToBoxAdapter(
-          child: WorkoutLogSection(
-            selectedDay: widget.selectedDay,
-            onAddWorkout: widget.onAddWorkout,
-            onDeleteWorkout: widget.onDeleteWorkout,
-            showOnlyHeader: false,
-            sheetController: widget.sheetController,
-          ),
-        ),
-        const SliverToBoxAdapter(child: SizedBox(height: 80)),
+        const SizedBox(height: 80),
       ],
     );
   }
