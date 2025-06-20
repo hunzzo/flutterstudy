@@ -131,7 +131,7 @@ class WorkoutHomePageState extends State<WorkoutHomePage>
                           left: 0,
                           right: 0,
                           bottom: kTextTabBarHeight,
-                          height: 40,
+                          height: 80,
                           child: Container(
                             key: _swipeRegionKey,
                             color: Colors.transparent,

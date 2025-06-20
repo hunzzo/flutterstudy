@@ -53,6 +53,11 @@ class _MuscleVolumeSectionState extends State<MuscleVolumeSection> {
           Expanded(
             child: SingleChildScrollView(
               child: ReorderableListView(
+                proxyDecorator: (child, index, animation) => 
+                    Material(
+                      color: Colors.transparent,
+                      child: child,
+                    ),
                 key: widget.listKey,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
